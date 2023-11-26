@@ -1,6 +1,6 @@
 ﻿namespace TaskBoard.net
 {
-    partial class Form1
+    partial class TaskBoard
     {
         /// <summary>
         /// Required designer variable.
@@ -41,17 +41,19 @@
             this.Board.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.Board.TabIndex = 0;
             this.Board.TabStop = false;
-            this.Board.Click += new System.EventHandler(this.Board_Click);
+            this.Board.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Board_MouseDown);
+            this.Board.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Board_MouseMove);
+            this.Board.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Board_MouseUp);
             // 
-            // Form1
+            // TaskBoard
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(948, 595);
             this.Controls.Add(this.Board);
-            this.Name = "Form1";
+            this.Name = "TaskBoard";
             this.Text = "Form1";
-            this.Load += new System.EventHandler(this.Form1_Load);
+            this.Load += new System.EventHandler(this.TaskBoard_Load);
             ((System.ComponentModel.ISupportInitialize)(this.Board)).EndInit();
             this.ResumeLayout(false);
 
