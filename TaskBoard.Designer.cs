@@ -52,7 +52,7 @@
             this.ClientSize = new System.Drawing.Size(948, 595);
             this.Controls.Add(this.Board);
             this.Name = "TaskBoard";
-            this.Text = "Form1";
+            this.Text = "TaskBoard";
             this.Load += new System.EventHandler(this.TaskBoard_Load);
             ((System.ComponentModel.ISupportInitialize)(this.Board)).EndInit();
             this.ResumeLayout(false);
