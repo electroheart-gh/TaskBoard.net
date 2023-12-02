@@ -61,8 +61,8 @@ namespace TaskBoard.net
             // g.FillRectangle(Brushes.Black, Board.ClientRectangle);
             // }
 
-            //PictureBox1に表示する
-            //Board.Image = canvas;
+            Renew();
+
         }
 
         private void Board_MouseDown(object sender, MouseEventArgs e)
@@ -117,17 +117,6 @@ namespace TaskBoard.net
             isSelecting = false;
 
         }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void taskUserControl1_Load(object sender, EventArgs e)
-        {
-
-        }
-
 
 
         //

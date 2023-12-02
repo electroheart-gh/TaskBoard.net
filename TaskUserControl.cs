@@ -17,7 +17,7 @@ namespace TaskBoard.net
     {
 
         public IntPtr WindowHandle { get; set; }
-        
+
         private bool isSelected;
         public bool IsSelected { get => isSelected; set => isSelected = value; }
         //Icon winIcon;
@@ -139,7 +139,14 @@ namespace TaskBoard.net
 
         internal bool Renew()
         {
-            throw new NotImplementedException();
+            StringBuilder tn = new StringBuilder(256);
+            if (GetWindowText(WindowHandle, tn, tn.Capacity) == 0)
+            {
+                return false;
+            }
+
+            TaskName = tn;
+            return true;
         }
     }
 }
