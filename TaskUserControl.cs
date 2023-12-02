@@ -16,12 +16,15 @@ namespace TaskBoard.net
     public partial class TaskUserControl : UserControl
     {
 
-        public IntPtr windowHandle{ get; set; }
-        bool isSelected;
+        public IntPtr WindowHandle { get; set; }
+        
+        private bool isSelected;
+        public bool IsSelected { get => isSelected; set => isSelected = value; }
         //Icon winIcon;
 
         //public StringBuilder taskName { get; set; } = new StringBuilder(256);
         private StringBuilder taskName = new StringBuilder(256);
+
         public StringBuilder TaskName
         {
             get { return taskName; }
@@ -31,7 +34,7 @@ namespace TaskBoard.net
 
         public TaskUserControl(IntPtr hwnd)
         {
-            windowHandle = hwnd;
+            WindowHandle = hwnd;
             pbIcon.Image = GetTaskIcon(hwnd).ToBitmap();
 
             //StringBuilder tn = new StringBuilder(256);
@@ -134,5 +137,9 @@ namespace TaskBoard.net
             return null;
         }
 
+        internal bool Renew()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -90,16 +90,19 @@ namespace TaskBoard.net
                 Point p2 = new Point(rubberBandStart.X, rubberBandEnd.Y);
                 Point p3 = new Point(rubberBandEnd.X, rubberBandEnd.Y);
                 DrawQuadLine(p0, p1, p2, p3);
+
+                var rectRB = new Rectangle(rubberBandStart.X, rubberBandStart.Y, rubberBandEnd.X, rubberBandEnd.Y);
+                foreach (var taskControl in Controls.OfType<TaskUserControl>())
+                {
+                    // if rubber band overlaps tasks, set it to selected
+                    if (taskControl.ClientRectangle.IntersectsWith(rectRB))
+                    {
+                        taskControl.IsSelected = true;
+                    }
+                }
+
             }
 
-            var taskControlList = from Control ctrl in Controls
-                                  where ctrl.GetType() == typeof(TaskUserControl)
-                                  select (TaskUserControl)ctrl;
-
-            foreach (var item in taskControlList)
-            {
-                // if rubber band overlaps tasks, set it to selected
-            }
 
         }
 
@@ -238,10 +241,10 @@ namespace TaskBoard.net
 
             foreach (var taskControl in taskControlList)
             {
-                if (hWndListRunningTask.Contains(taskControl.windowHandle))
+                if (hWndListRunningTask.Contains(taskControl.WindowHandle))
                 {
-                    GetWindowText(taskControl.windowHandle, taskControl.TaskName, taskControl.TaskName.Capacity);
-                    hWndListRunningTask.Remove(taskControl.windowHandle);
+                    GetWindowText(taskControl.WindowHandle, taskControl.TaskName, taskControl.TaskName.Capacity);
+                    hWndListRunningTask.Remove(taskControl.WindowHandle);
                 }
                 else
                 {
@@ -266,7 +269,7 @@ namespace TaskBoard.net
             {
                 if (taskControl.Renew())
                 {
-                    runningTasks.Remove(taskControl.windowHandle);
+                    runningTasks.Remove(taskControl.WindowHandle);
                 }
                 else
                 {
