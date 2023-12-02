@@ -258,27 +258,27 @@ namespace TaskBoard.net
             }
         }
 
-        private void RefreshBoard()
+        private void Renew()
         {
             var runningTasks = GetTaskHwndList();
 
             foreach (var taskControl in Controls.OfType<TaskUserControl>())
             {
-                if (runningTasks.Contains(taskControl.windowHandle))
+                if (taskControl.Renew())
                 {
-                    taskControl.update();
                     runningTasks.Remove(taskControl.windowHandle);
                 }
                 else
                 {
-                    taskControl.remove();
+                    taskControl.Dispose();
                 }
             }
-            foreach (var task in runningTasks)
+
+            foreach (var newTask in runningTasks)
             {
-                var newTask = new TaskUserControl(task);
-                newTask.Location = ProposePosition();
-                Controls.Add(newTask);
+                var newTaskControl = new TaskUserControl(newTask);
+                newTaskControl.Location = ProposePosition();
+                Controls.Add(newTaskControl);
             }
         }
 
