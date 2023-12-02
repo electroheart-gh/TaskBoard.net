@@ -17,20 +17,24 @@ namespace TaskBoard.net
     public partial class TaskBoard : Form
     {
         //
+        // 基本設定
+        //
+        Dictionary<IntPtr, TaskUserControl> tasks;
+
+        //
         // Rubber Band 関連
         //
-        bool isSelecting { get; set; }
-        Bitmap rubberBandBitmap { get; set; }
-        Point rubberBandStart { get; set; }
-        Point rubberBandEnd { get; set; }
+        bool isSelecting;
 
-        Color lineColor { get; set; } = Color.Red;
-        int lineBorder { get; set; } = 1;
+        Bitmap rubberBandBitmap;
+        Point rubberBandStart;
+        Point rubberBandEnd;
+
+        Color lineColor = Color.Red;
+        int lineBorder = 1;
 
         Graphics gRubberBand;
         Pen linePen;
-
-
 
 
         //
@@ -214,7 +218,7 @@ namespace TaskBoard.net
             }
         }
 
-        private void RefreshBoard()
+        private void OldRefreshBoard()
         {
             //List<IntPtr> runningTaskListHwnd = GetTaskList();
 
@@ -225,6 +229,12 @@ namespace TaskBoard.net
             var taskControlList = from Control ctrl in Controls
                                   where ctrl.GetType() == typeof(TaskUserControl)
                                   select (TaskUserControl)ctrl;
+
+
+            foreach (var item in Controls.OfType<TaskUserControl>())
+            {
+
+            }
 
             foreach (var taskControl in taskControlList)
             {
@@ -246,9 +256,30 @@ namespace TaskBoard.net
                 newTask.Location = ProposePosition();
                 Controls.Add(newTask);
             }
+        }
 
+        private void RefreshBoard()
+        {
+            var runningTasks = GetTaskHwndList();
 
-
+            foreach (var taskControl in Controls.OfType<TaskUserControl>())
+            {
+                if (runningTasks.Contains(taskControl.windowHandle))
+                {
+                    taskControl.update();
+                    runningTasks.Remove(taskControl.windowHandle);
+                }
+                else
+                {
+                    taskControl.remove();
+                }
+            }
+            foreach (var task in runningTasks)
+            {
+                var newTask = new TaskUserControl(task);
+                newTask.Location = ProposePosition();
+                Controls.Add(newTask);
+            }
         }
 
 
