@@ -1,4 +1,4 @@
-﻿namespace TaskBoard.net
+﻿namespace TaskBoardWf
 {
     partial class TaskUserControl
     {

@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace TaskBoard.net
+namespace TaskBoardWf
 {
     public partial class TaskUserControl : UserControl
     {

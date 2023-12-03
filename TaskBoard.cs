@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace TaskBoard.net
+namespace TaskBoardWf
 {
     public partial class TaskBoard : Form
     {
@@ -95,6 +95,7 @@ namespace TaskBoard.net
                 foreach (var taskControl in Controls.OfType<TaskUserControl>())
                 {
                     // if rubber band overlaps tasks, set it to selected
+                    // TODO: Change to screen point
                     if (taskControl.ClientRectangle.IntersectsWith(rectRB))
                     {
                         taskControl.IsSelected = true;
@@ -102,8 +103,6 @@ namespace TaskBoard.net
                 }
 
             }
-
-
         }
 
         private void Board_MouseUp(object sender, MouseEventArgs e)
@@ -319,6 +318,11 @@ namespace TaskBoard.net
 
             // PictureBoxに表示
             Board.Image = rubberBandBitmap;
+        }
+
+        private void taskUserControl1_Load(object sender, EventArgs e)
+        {
+
         }
 
 
