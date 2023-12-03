@@ -34,7 +34,10 @@ namespace TaskBoard.net
 
         public TaskUserControl(IntPtr hwnd)
         {
+            InitializeComponent();
+
             WindowHandle = hwnd;
+            //pbIcon = new PictureBox();
             pbIcon.Image = GetTaskIcon(hwnd).ToBitmap();
 
             //StringBuilder tn = new StringBuilder(256);
@@ -43,7 +46,6 @@ namespace TaskBoard.net
 
             GetWindowText(hwnd, taskName, taskName.Capacity);
 
-            InitializeComponent();
         }
 
         public TaskUserControl()

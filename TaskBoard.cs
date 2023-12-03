@@ -187,9 +187,9 @@ namespace TaskBoard.net
         {
             Control baseCtrl = null;
 
-            foreach (Control ctrl in Controls)
+            foreach (Control ctrl in Controls.OfType<TaskUserControl>())
             {
-                if (ctrl.GetType() == typeof(TaskUserControl) && baseCtrl != null && baseCtrl.Bottom >= ctrl.Bottom && baseCtrl.Right >= ctrl.Right)
+                if (baseCtrl == null || baseCtrl.Bottom <= ctrl.Bottom || baseCtrl.Right <= ctrl.Right)
                 {
                     baseCtrl = ctrl;
                 }
@@ -202,11 +202,11 @@ namespace TaskBoard.net
             }
             else if (baseCtrl.Right + baseCtrl.Width > Width)
             {
-                return new Point(0, baseCtrl.Bottom + baseCtrl.Height);
+                return new Point(0, baseCtrl.Top + baseCtrl.Height);
             }
             else
             {
-                return new Point(baseCtrl.Right, baseCtrl.Bottom);
+                return new Point(baseCtrl.Right, baseCtrl.Top);
             }
         }
 
