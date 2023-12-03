@@ -23,6 +23,7 @@ namespace TaskBoardWf
 
         //
         // Rubber Band 関連
+        // TODO: write rubber band above the task icon 
         //
         bool isSelecting;
 
@@ -95,8 +96,7 @@ namespace TaskBoardWf
                 foreach (var taskControl in Controls.OfType<TaskUserControl>())
                 {
                     // if rubber band overlaps tasks, set it to selected
-                    // TODO: Change to screen point
-                    if (taskControl.ClientRectangle.IntersectsWith(rectRB))
+                    if(new Rectangle(taskControl.Location, taskControl.Size).IntersectsWith(rectRB))
                     {
                         taskControl.IsSelected = true;
                     }
@@ -188,7 +188,7 @@ namespace TaskBoardWf
 
             foreach (Control ctrl in Controls.OfType<TaskUserControl>())
             {
-                if (baseCtrl == null || baseCtrl.Bottom <= ctrl.Bottom || baseCtrl.Right <= ctrl.Right)
+                if (baseCtrl == null || baseCtrl.Bottom < ctrl.Bottom || baseCtrl.Right < ctrl.Right)
                 {
                     baseCtrl = ctrl;
                 }
@@ -270,6 +270,8 @@ namespace TaskBoardWf
                 var newTaskControl = new TaskUserControl(newTask);
                 newTaskControl.Location = ProposePosition();
                 Controls.Add(newTaskControl);
+                newTaskControl.BringToFront();
+
             }
         }
 

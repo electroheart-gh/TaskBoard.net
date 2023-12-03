@@ -20,15 +20,12 @@ namespace TaskBoardWf
 
         private bool isSelected;
         public bool IsSelected { get => isSelected; set => isSelected = value; }
-        //Icon winIcon;
 
-        //public StringBuilder taskName { get; set; } = new StringBuilder(256);
         private StringBuilder taskName = new StringBuilder(256);
-
         public StringBuilder TaskName
         {
             get { return taskName; }
-            set { taskName = value; lblTaskName.Text = taskName.ToString(); }
+            set { taskName = value; lblTaskName.Text = value.ToString(); }
         }
 
 
@@ -45,6 +42,7 @@ namespace TaskBoardWf
             //taskName = tn;
 
             GetWindowText(hwnd, taskName, taskName.Capacity);
+            TaskName = taskName;
 
         }
 
