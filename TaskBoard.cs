@@ -92,16 +92,20 @@ namespace TaskBoardWf
                 Point p3 = new Point(rubberBandEnd.X, rubberBandEnd.Y);
                 DrawQuadLine(p0, p1, p2, p3);
 
-                var rectRB = new Rectangle(rubberBandStart.X, rubberBandStart.Y, rubberBandEnd.X, rubberBandEnd.Y);
+                // if rubber band overlaps tasks, set it to selected
+                var rectRB = RectangleExt.Create(rubberBandStart, rubberBandEnd);
+
                 foreach (var taskControl in Controls.OfType<TaskUserControl>())
                 {
-                    // if rubber band overlaps tasks, set it to selected
                     if(new Rectangle(taskControl.Location, taskControl.Size).IntersectsWith(rectRB))
                     {
                         taskControl.IsSelected = true;
                     }
+                    else
+                    {
+                        taskControl.IsSelected= false;
+                    }
                 }
-
             }
         }
 
@@ -114,7 +118,6 @@ namespace TaskBoardWf
             linePen.Dispose();
             gRubberBand.Dispose();
             isSelecting = false;
-
         }
 
 

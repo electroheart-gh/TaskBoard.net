@@ -15,6 +15,7 @@ namespace TaskBoardWf
 {
     public partial class TaskUserControl : UserControl
     {
+        // TODO: make icons smaller
 
         public IntPtr WindowHandle { get; set; }
 

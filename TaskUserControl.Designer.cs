@@ -44,6 +44,7 @@
             // 
             // lblTaskName
             // 
+            this.lblTaskName.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.lblTaskName.Location = new System.Drawing.Point(0, 50);
             this.lblTaskName.Name = "lblTaskName";
             this.lblTaskName.Size = new System.Drawing.Size(80, 30);
