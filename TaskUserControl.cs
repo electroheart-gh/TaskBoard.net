@@ -17,6 +17,10 @@ namespace TaskBoardWf
     {
         // TODO: make icons smaller
 
+
+        //
+        // Parameters and variables
+        //
         public IntPtr WindowHandle { get; set; }
 
         private bool isSelected;
@@ -30,6 +34,9 @@ namespace TaskBoardWf
         }
 
 
+        //
+        // Constructors
+        //
         public TaskUserControl(IntPtr hwnd)
         {
             InitializeComponent();
@@ -52,7 +59,9 @@ namespace TaskBoardWf
             InitializeComponent();
         }
 
-
+        //
+        // Constants and declarations
+        //
         private const uint ICON_SMALL = 0;
         private const uint ICON_BIG = 1;
         private const uint WM_GETICON = 0x7F;
@@ -72,6 +81,9 @@ namespace TaskBoardWf
         private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
 
+        //
+        // Methods
+        //
         private static Icon GetTaskIcon(IntPtr hWnd)
         {
             IntPtr hIcon = SendMessage(hWnd, WM_GETICON, (IntPtr)ICON_BIG, IntPtr.Zero);
@@ -124,20 +136,7 @@ namespace TaskBoardWf
             }
         }
 
-
-        private static Icon GetIconFromExe(IntPtr hWnd)
-        {
-            GetWindowThreadProcessId(hWnd, out uint processId);
-            Process process = Process.GetProcessById((int)processId);
-            string filePath = process?.MainModule?.FileName;
-
-            if (File.Exists(filePath))
-            {
-                return Icon.ExtractAssociatedIcon(filePath);
-            }
-            return null;
-        }
-
+        // Update task name of Task control
         internal bool Renew()
         {
             StringBuilder tn = new StringBuilder(256);
