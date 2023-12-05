@@ -23,7 +23,6 @@ namespace TaskBoardWf
         //
         bool isSelecting;
 
-        Bitmap rubberBandBitmap;
         Point rubberBandStart;
         Point rubberBandEnd;
 
@@ -44,7 +43,7 @@ namespace TaskBoardWf
 
 
         //
-        // Event Handler
+        // Event Handlers
         //
         private void TaskBoard_Load(object sender, EventArgs e)
         {
@@ -54,8 +53,11 @@ namespace TaskBoardWf
 
         private void Board_MouseDown(object sender, MouseEventArgs e)
         {
-            rubberBandStart = cursorClientPos();
-            isSelecting = true;
+            if (e.Button == MouseButtons.Left)
+            {
+                rubberBandStart = cursorClientPos();
+                isSelecting = true;
+            }
         }
 
         private void Board_MouseMove(object sender, MouseEventArgs e)
@@ -90,14 +92,13 @@ namespace TaskBoardWf
 
         private void Board_MouseUp(object sender, MouseEventArgs e)
         {
-            // Erase rubber band
-            rubberBandBitmap = new Bitmap(Board.Width, Board.Height);
-            Board.Image = rubberBandBitmap;
-            isSelecting = false;
-
-            // Release resources
-            linePen.Dispose();
-            gRubberBand.Dispose();
+            if (e.Button == MouseButtons.Left)
+            {
+                // Erase rubber band
+                // TODO: Change Board control to Rubber band control to minimize its size for memory usage etc.
+                Board.Image = new Bitmap(Board.Width, Board.Height);
+                isSelecting = false;
+            }
         }
 
 
@@ -251,7 +252,7 @@ namespace TaskBoardWf
         {
 
             // Specifying nothing but the size creates noncolor canvas 
-            rubberBandBitmap = new Bitmap(Board.Width, Board.Height);
+            var rubberBandBitmap = new Bitmap(Board.Width, Board.Height);
 
             // Create Graphics object for the rubber band
             gRubberBand = Graphics.FromImage(rubberBandBitmap);
@@ -265,6 +266,10 @@ namespace TaskBoardWf
             gRubberBand.DrawLine(linePen, p1, p3); // right
 
             Board.Image = rubberBandBitmap;
+
+            // Release resources
+            linePen.Dispose();
+            gRubberBand.Dispose();
         }
     }
 }
