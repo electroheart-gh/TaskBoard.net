@@ -33,6 +33,9 @@ namespace TaskBoardWf
             set { taskName = value; lblTaskName.Text = value.ToString(); }
         }
 
+        private bool isDragging;
+        private Point dragStart;
+
 
         //
         // Constructors
@@ -147,6 +150,31 @@ namespace TaskBoardWf
 
             TaskName = tn;
             return true;
+        }
+
+        private void TaskUserControl_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                dragStart = e.Location;
+                isDragging = true;
+            }
+        }
+
+        private void TaskUserControl_MouseMove(object sender, MouseEventArgs e)
+        {
+            if(isDragging)
+            {
+                Location = new Point(Location.X + e.Location.X - dragStart.X, Location.Y + e.Location.Y - dragStart.Y);
+            }
+        }
+
+        private void TaskUserControl_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                isDragging = false;
+            }
         }
     }
 }

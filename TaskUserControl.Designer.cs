@@ -41,6 +41,9 @@
             this.pbIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pbIcon.TabIndex = 0;
             this.pbIcon.TabStop = false;
+            this.pbIcon.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseDown);
+            this.pbIcon.MouseMove += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseMove);
+            this.pbIcon.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseUp);
             // 
             // lblTaskName
             // 
@@ -51,6 +54,9 @@
             this.lblTaskName.TabIndex = 1;
             this.lblTaskName.Text = "taskname";
             this.lblTaskName.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.lblTaskName.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseDown);
+            this.lblTaskName.MouseMove += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseMove);
+            this.lblTaskName.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseUp);
             // 
             // TaskUserControl
             // 
@@ -60,6 +66,9 @@
             this.Controls.Add(this.pbIcon);
             this.Name = "TaskUserControl";
             this.Size = new System.Drawing.Size(80, 80);
+            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseDown);
+            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseMove);
+            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseUp);
             ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).EndInit();
             this.ResumeLayout(false);
 

@@ -232,6 +232,8 @@ namespace TaskBoardWf
                 newTaskControl.BringToFront();
 
             }
+
+            // TODO: Save tasks positions to recover the layout when restarting after crashes
         }
 
 
