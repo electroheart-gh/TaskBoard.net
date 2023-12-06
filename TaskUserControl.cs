@@ -156,8 +156,18 @@ namespace TaskBoardWf
         {
             if (e.Button == MouseButtons.Left)
             {
+                BringToFront();
                 dragStart = e.Location;
                 isDragging = true;
+
+                if (!isSelected)
+                {
+                    foreach (var ctrl in Parent.Controls.OfType<TaskUserControl>())
+                    {
+                        ctrl.isSelected = false;
+                    }
+                    isSelected = true;
+                }
             }
         }
 
@@ -165,7 +175,15 @@ namespace TaskBoardWf
         {
             if(isDragging)
             {
-                Location = new Point(Location.X + e.Location.X - dragStart.X, Location.Y + e.Location.Y - dragStart.Y);
+                //Location = new Point(Location.X + e.Location.X - dragStart.X, Location.Y + e.Location.Y - dragStart.Y);
+                foreach (var ctrl in Parent.Controls.OfType<TaskUserControl>())
+                {
+                    if (ctrl.isSelected)
+                    {
+                        ctrl.Location = new Point(ctrl.Location.X + e.Location.X - dragStart.X, ctrl.Location.Y + e.Location.Y - dragStart.Y);
+                    }
+                }
+
             }
         }
 

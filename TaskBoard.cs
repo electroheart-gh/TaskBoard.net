@@ -49,12 +49,15 @@ namespace TaskBoardWf
         {
             // Initialize displaying Task controls on the Board using Renew()
             Renew();
+
+            // TODO: Do not display the task board on the task bar
         }
 
         private void Board_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
+                Renew();
                 rubberBandStart = cursorClientPos();
                 isSelecting = true;
             }
@@ -176,12 +179,12 @@ namespace TaskBoardWf
             Control baseCtrl = null;
 
             // TODO: Consider where to place the new Task
-            // TODO: Consider to disallow overlapping
+            // TODO: Disallow overlapping controls
 
             // Next to the most bottom and most right Task control
             foreach (Control ctrl in Controls.OfType<TaskUserControl>())
             {
-                if (baseCtrl == null || baseCtrl.Bottom < ctrl.Bottom || baseCtrl.Right < ctrl.Right)
+                if (baseCtrl == null || baseCtrl.Bottom < ctrl.Bottom || (baseCtrl.Bottom == ctrl.Bottom && baseCtrl.Right < ctrl.Right))
                 {
                     baseCtrl = ctrl;
                 }

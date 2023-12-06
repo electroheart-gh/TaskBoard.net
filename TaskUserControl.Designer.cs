@@ -35,6 +35,7 @@
             // 
             // pbIcon
             // 
+            this.pbIcon.BackColor = System.Drawing.SystemColors.Control;
             this.pbIcon.Location = new System.Drawing.Point(15, 0);
             this.pbIcon.Name = "pbIcon";
             this.pbIcon.Size = new System.Drawing.Size(50, 50);
@@ -47,6 +48,7 @@
             // 
             // lblTaskName
             // 
+            this.lblTaskName.BackColor = System.Drawing.SystemColors.Control;
             this.lblTaskName.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.lblTaskName.Location = new System.Drawing.Point(0, 50);
             this.lblTaskName.Name = "lblTaskName";
@@ -62,6 +64,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.Control;
             this.Controls.Add(this.lblTaskName);
             this.Controls.Add(this.pbIcon);
             this.Name = "TaskUserControl";

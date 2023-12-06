@@ -39,7 +39,7 @@
             this.Board.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Board.Location = new System.Drawing.Point(0, 0);
             this.Board.Name = "Board";
-            this.Board.Size = new System.Drawing.Size(948, 595);
+            this.Board.Size = new System.Drawing.Size(922, 595);
             this.Board.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.Board.TabIndex = 0;
             this.Board.TabStop = false;
@@ -49,6 +49,7 @@
             // 
             // taskUserControl1
             // 
+            this.taskUserControl1.BackColor = System.Drawing.Color.Transparent;
             this.taskUserControl1.IsSelected = false;
             this.taskUserControl1.Location = new System.Drawing.Point(525, 132);
             this.taskUserControl1.Name = "taskUserControl1";
@@ -61,7 +62,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(948, 595);
+            this.ClientSize = new System.Drawing.Size(922, 595);
             this.Controls.Add(this.Board);
             this.Name = "TaskBoard";
             this.Text = "TaskBoard";
