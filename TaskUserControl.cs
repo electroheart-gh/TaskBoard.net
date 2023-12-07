@@ -24,7 +24,18 @@ namespace TaskBoardWf
         public IntPtr WindowHandle { get; set; }
 
         private bool isSelected;
-        public bool IsSelected { get => isSelected; set => isSelected = value; }
+        public bool IsSelected
+        {
+            get { return isSelected; }
+            set
+            {
+                isSelected = value;
+                if (value) { BackColor = SystemColors.ActiveCaption; }
+                else { BackColor = SystemColors.Control; }
+            }
+        }
+
+
 
         private StringBuilder taskName = new StringBuilder(256);
         public StringBuilder TaskName
@@ -72,7 +83,7 @@ namespace TaskBoardWf
         private const uint WM_GETICON = 0x7F;
         private const int GCL_HICON = -14;
         private const int GCL_HICONSM = -34;
-        
+
         private const int WPF_RESTORETOMAXIMIZED = 0x02;
         private const int SW_SHOWNORMAL = 1;
         private const int SW_SHOWMINIMIZED = 2;
@@ -194,7 +205,7 @@ namespace TaskBoardWf
             GetWindowPlacement(hWnd, ref placement);
             if ((placement.showCmd & SW_SHOWMINIMIZED) == SW_SHOWMINIMIZED)
             {
-                if((placement.flags & WPF_RESTORETOMAXIMIZED) == WPF_RESTORETOMAXIMIZED)
+                if ((placement.flags & WPF_RESTORETOMAXIMIZED) == WPF_RESTORETOMAXIMIZED)
                 {
                     ShowWindow(hWnd, SW_SHOWMAXIMIZED);
                 }
@@ -218,13 +229,13 @@ namespace TaskBoardWf
                 dragStart = e.Location;
 
                 // If clicking unselected Task, select it and unselect others
-                if (!isSelected)
+                if (!IsSelected)
                 {
                     foreach (var ctrl in Parent.Controls.OfType<TaskUserControl>())
                     {
-                        ctrl.isSelected = false;
+                        ctrl.IsSelected = false;
                     }
-                    isSelected = true;
+                    IsSelected = true;
                 }
             }
         }
@@ -232,17 +243,17 @@ namespace TaskBoardWf
         private void TaskUserControl_MouseMove(object sender, MouseEventArgs e)
         {
 
-            if (e.Button==MouseButtons.Left)
+            if (e.Button == MouseButtons.Left)
             {
                 // Count how many times it is dragged between MouseDown and MouseUp
                 drags += 1;
                 foreach (var ctrl in Parent.Controls.OfType<TaskUserControl>())
                 {
                     // Drag selected Tasks
-                    if (ctrl.isSelected)
+                    if (ctrl.IsSelected)
                     {
                         ctrl.Location = new Point(ctrl.Location.X + e.Location.X - dragStart.X, ctrl.Location.Y + e.Location.Y - dragStart.Y);
-                        
+
                     }
                 }
             }

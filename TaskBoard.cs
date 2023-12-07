@@ -60,6 +60,10 @@ namespace TaskBoardWf
                 Renew();
                 rubberBandStart = PointToClient(Cursor.Position);
                 isSelecting = true;
+                foreach (var taskControl in Controls.OfType<TaskUserControl>())
+                {
+                    taskControl.IsSelected = false;
+                }
             }
         }
 

@@ -35,7 +35,7 @@
             // 
             // pbIcon
             // 
-            this.pbIcon.BackColor = System.Drawing.SystemColors.Control;
+            this.pbIcon.BackColor = System.Drawing.Color.Transparent;
             this.pbIcon.Location = new System.Drawing.Point(15, 0);
             this.pbIcon.Name = "pbIcon";
             this.pbIcon.Size = new System.Drawing.Size(50, 50);
@@ -48,7 +48,7 @@
             // 
             // lblTaskName
             // 
-            this.lblTaskName.BackColor = System.Drawing.SystemColors.Control;
+            this.lblTaskName.BackColor = System.Drawing.Color.Transparent;
             this.lblTaskName.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.lblTaskName.Location = new System.Drawing.Point(0, 50);
             this.lblTaskName.Name = "lblTaskName";
