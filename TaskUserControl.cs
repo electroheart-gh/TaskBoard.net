@@ -33,7 +33,7 @@ namespace TaskBoardWf
             set { taskName = value; lblTaskName.Text = value.ToString(); }
         }
 
-        private int isDragged;
+        private int drags;
         private Point dragStart;
 
 
@@ -216,11 +216,6 @@ namespace TaskBoardWf
             {
                 BringToFront();
                 dragStart = e.Location;
-                Console.WriteLine("mousedown ");
-                Console.WriteLine("mousedown this.location: {0}", Location.ToString());
-                Console.WriteLine("mousedown e.location: {0}", e.Location.ToString());
-                Console.WriteLine("mousedown dragStart: {0}", dragStart.ToString());
-                Console.WriteLine("mousedown cursor.position: {0}", Cursor.Position.ToString());
 
                 // If clicking unselected Task, select it and unselect others
                 if (!isSelected)
@@ -236,14 +231,11 @@ namespace TaskBoardWf
 
         private void TaskUserControl_MouseMove(object sender, MouseEventArgs e)
         {
-            //Console.WriteLine("mousemove ");
-            //Console.WriteLine("mousemove this.location: {0}", Location.ToString());
-            //Console.WriteLine("mousemove e.location: {0}", e.Location.ToString());
-            //Console.WriteLine("mousemove dragStart: {0}", dragStart.ToString());
-            //Console.WriteLine("mousemove cursor.position: {0}", Cursor.Position.ToString());
+
             if (e.Button==MouseButtons.Left)
             {
-                isDragged += 1;
+                // Count how many times it is dragged between MouseDown and MouseUp
+                drags += 1;
                 foreach (var ctrl in Parent.Controls.OfType<TaskUserControl>())
                 {
                     // Drag selected Tasks
@@ -260,25 +252,19 @@ namespace TaskBoardWf
         {
             if (e.Button == MouseButtons.Left)
             {
-                //Console.WriteLine("mouseup ");
-                //Console.WriteLine("mouseup e.location: {0}", e.Location.ToString());
-                //Console.WriteLine("mouseup dragStart: {0}", dragStart.ToString());
-                //Console.WriteLine("mouseup cursor.position: {0}", Cursor.Position.ToString());
-
-                if (isDragged < DRAG_MOVE_ALLOWANCE)
+                if (drags < DRAG_MOVE_ALLOWANCE)
                 {
                     SetForegroundTask(WindowHandle);
                 }
-                isDragged = 0;
+                drags = 0;
             }
         }
 
         private void TaskUserControl_MouseClick(object sender, MouseEventArgs e)
         {
-            //Console.WriteLine("mouseclick ");
-            //Console.WriteLine("mouseclick e.location: {0}", e.Location.ToString());
-            //Console.WriteLine("mouseclick dragStart: {0}", dragStart.ToString());
-            //Console.WriteLine("mouseclick cursor.position: {0}", Cursor.Position.ToString());
+            // Gave up to use click event which cant handle dragging properly
+            // Guessed that dragging is recognized by distance between original position and mouse e.location 
+            // but the control moves with mouse when dragged and this makes the distance to 0
 
         }
     }
