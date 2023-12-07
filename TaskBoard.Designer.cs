@@ -36,6 +36,7 @@
             // 
             // Board
             // 
+            this.Board.BackColor = System.Drawing.SystemColors.Control;
             this.Board.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Board.Location = new System.Drawing.Point(0, 0);
             this.Board.Name = "Board";

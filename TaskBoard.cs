@@ -58,7 +58,7 @@ namespace TaskBoardWf
             if (e.Button == MouseButtons.Left)
             {
                 Renew();
-                rubberBandStart = cursorClientPos();
+                rubberBandStart = PointToClient(Cursor.Position);
                 isSelecting = true;
             }
         }
@@ -67,7 +67,7 @@ namespace TaskBoardWf
         {
             if (isSelecting)
             {
-                rubberBandEnd = cursorClientPos();
+                rubberBandEnd = PointToClient(Cursor.Position);
 
                 // Draw rubber band
                 Point p0 = new Point(rubberBandStart.X, rubberBandStart.Y);
@@ -243,14 +243,6 @@ namespace TaskBoardWf
         //
         // Methods for rubber band
         //
-
-        private Point cursorClientPos()
-        {
-            Point p = Cursor.Position;
-            Point cp = this.PointToClient(p);
-
-            return cp;
-        }
 
         // Draw quad line
         private void DrawQuadLine(Point p0, Point p1, Point p2, Point p3)
