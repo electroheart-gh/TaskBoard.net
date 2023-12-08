@@ -10,9 +10,6 @@ namespace TaskBoardWf
 {
     public partial class TaskUserControl : UserControl
     {
-        // TODO: make icons smaller
-
-
         //
         // Parameters and variables
         //
@@ -31,12 +28,20 @@ namespace TaskBoardWf
         }
 
 
-
         private StringBuilder taskName = new StringBuilder(256);
         public StringBuilder TaskName
         {
             get { return taskName; }
-            set { taskName = value; lblTaskName.Text = value.ToString(); }
+            set
+            {
+                taskName = value; 
+                lblTaskName.Text = value.ToString();
+                toolTipTaskName.SetToolTip(this, value.ToString());
+                toolTipTaskName.SetToolTip(lblTaskName, value.ToString());
+                toolTipTaskName.SetToolTip(pbIcon, value.ToString());
+
+            }
+
         }
 
         private int drags;
@@ -271,6 +276,11 @@ namespace TaskBoardWf
             // Gave up to use click event which cant handle dragging properly
             // Guessed that dragging is recognized by distance between original position and mouse e.location 
             // but the control moves with mouse when dragged and this makes the distance to 0
+
+        }
+
+        private void toolTip1_Popup(object sender, PopupEventArgs e)
+        {
 
         }
     }

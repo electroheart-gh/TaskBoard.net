@@ -210,6 +210,7 @@ namespace TaskBoardWf
         private void Renew()
         {
             var runningTasks = GetTaskHwndList();
+            var taskToRemove = new List<TaskUserControl>();
 
             foreach (var taskControl in Controls.OfType<TaskUserControl>())
             {
@@ -220,9 +221,16 @@ namespace TaskBoardWf
                 }
                 else
                 {
-                    // Delete obsolete tasks
-                    taskControl.Dispose();
+                    // Add obsolete tasks to the list
+                    // Disposing control here makes "foreach" not work properly
+                    taskToRemove.Add(taskControl);
                 }
+            }
+
+            // Dispose obsolete Task controls 
+            foreach (var task in taskToRemove)
+            {
+                task.Dispose();
             }
 
             // Add new tasks
