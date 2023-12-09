@@ -32,12 +32,18 @@
             this.pbIcon = new System.Windows.Forms.PictureBox();
             this.lblTaskName = new System.Windows.Forms.Label();
             this.toolTipTaskName = new System.Windows.Forms.ToolTip(this.components);
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.hideToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).BeginInit();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // pbIcon
             // 
             this.pbIcon.BackColor = System.Drawing.Color.Transparent;
+            this.pbIcon.ContextMenuStrip = this.contextMenuStrip1;
             this.pbIcon.Location = new System.Drawing.Point(16, 1);
             this.pbIcon.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.pbIcon.Name = "pbIcon";
@@ -52,8 +58,9 @@
             // lblTaskName
             // 
             this.lblTaskName.BackColor = System.Drawing.Color.Transparent;
+            this.lblTaskName.ContextMenuStrip = this.contextMenuStrip1;
             this.lblTaskName.Font = new System.Drawing.Font("Meiryo UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblTaskName.Location = new System.Drawing.Point(0, 40);
+            this.lblTaskName.Location = new System.Drawing.Point(0, 41);
             this.lblTaskName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblTaskName.Name = "lblTaskName";
             this.lblTaskName.Size = new System.Drawing.Size(72, 30);
@@ -70,13 +77,41 @@
             this.toolTipTaskName.AutoPopDelay = 5000;
             this.toolTipTaskName.InitialDelay = 50;
             this.toolTipTaskName.ReshowDelay = 10;
-            this.toolTipTaskName.Popup += new System.Windows.Forms.PopupEventHandler(this.toolTip1_Popup);
+            // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.closeToolStripMenuItem,
+            this.hideToolStripMenuItem,
+            this.openToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(181, 92);
+            // 
+            // closeToolStripMenuItem
+            // 
+            this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.closeToolStripMenuItem.Text = "Close";
+            this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
+            // 
+            // hideToolStripMenuItem
+            // 
+            this.hideToolStripMenuItem.Name = "hideToolStripMenuItem";
+            this.hideToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.hideToolStripMenuItem.Text = "Hide";
+            // 
+            // openToolStripMenuItem
+            // 
+            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openToolStripMenuItem.Text = "Open";
             // 
             // TaskUserControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
+            this.ContextMenuStrip = this.contextMenuStrip1;
             this.Controls.Add(this.lblTaskName);
             this.Controls.Add(this.pbIcon);
             this.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
@@ -88,6 +123,7 @@
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseUp);
             ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).EndInit();
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -97,5 +133,9 @@
         private System.Windows.Forms.PictureBox pbIcon;
         private System.Windows.Forms.Label lblTaskName;
         private System.Windows.Forms.ToolTip toolTipTaskName;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem closeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem hideToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
     }
 }

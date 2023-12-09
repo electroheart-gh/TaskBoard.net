@@ -21,6 +21,7 @@ namespace TaskBoardWf
         Point rubberBandStart;
         Point rubberBandEnd;
 
+        // TODO: Change color according to control color
         Color lineColor = Color.Red;
         int lineBorder = 1;
 
@@ -42,10 +43,12 @@ namespace TaskBoardWf
         //
         private void TaskBoard_Load(object sender, EventArgs e)
         {
+            WindowState = FormWindowState.Maximized;
+
             // Initialize displaying Task controls on the Board using Renew()
             Renew();
 
-            // TODO: Do not display the task board on the task bar
+            // TODO: Consider not to display the task board on the task bar
         }
 
         private void Board_MouseDown(object sender, MouseEventArgs e)
@@ -178,7 +181,7 @@ namespace TaskBoardWf
             Control baseCtrl = null;
 
             // TODO: Consider where to place the new Task
-            // TODO: Disallow overlapping controls
+            // TODO: Consider to disallow overlapping controls
 
             // Next to the most bottom and most right Task control
             foreach (Control ctrl in Controls.OfType<TaskUserControl>())

@@ -190,6 +190,7 @@ namespace TaskBoardWf
             StringBuilder tn = new StringBuilder(256);
             if (GetWindowText(WindowHandle, tn, tn.Capacity) == 0)
             {
+                lblTaskName.ForeColor = Color.Red;
                 return false;
             }
             TaskName = tn;
@@ -265,6 +266,7 @@ namespace TaskBoardWf
             {
                 if (drags < DRAG_MOVE_ALLOWANCE)
                 {
+                    Renew();
                     SetForegroundTask(WindowHandle);
                 }
                 drags = 0;
@@ -279,9 +281,10 @@ namespace TaskBoardWf
 
         }
 
-        private void toolTip1_Popup(object sender, PopupEventArgs e)
+        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+            
         }
     }
 }
