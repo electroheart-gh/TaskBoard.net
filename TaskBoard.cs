@@ -22,7 +22,7 @@ namespace TaskBoardWf
         Point rubberBandEnd;
 
         // TODO: Change color according to control color
-        Color lineColor = Color.Red;
+        Color lineColor = Color.Purple;   // Gray
         int lineBorder = 1;
 
         Graphics gRubberBand;
@@ -253,7 +253,6 @@ namespace TaskBoardWf
         // Draw quad line
         private void DrawQuadLine(Point p0, Point p1, Point p2, Point p3)
         {
-
             // Specifying nothing but the size creates noncolor canvas 
             var rubberBandBitmap = new Bitmap(Board.Width, Board.Height);
 

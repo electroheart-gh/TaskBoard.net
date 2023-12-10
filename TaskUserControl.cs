@@ -23,7 +23,7 @@ namespace TaskBoardWf
             set
             {
                 isSelected = value;
-                if (value) { BackColor = SystemColors.ActiveCaption; }
+                if (value) { BackColor = Color.Lavender; }  //lavender,  Gainsboro
                 else { BackColor = SystemColors.Control; }
             }
         }
