@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace TaskBoardWf
@@ -34,14 +35,12 @@ namespace TaskBoardWf
             get { return taskName; }
             set
             {
-                taskName = value; 
+                taskName = value;
                 lblTaskName.Text = value.ToString();
                 toolTipTaskName.SetToolTip(this, value.ToString());
                 toolTipTaskName.SetToolTip(lblTaskName, value.ToString());
                 toolTipTaskName.SetToolTip(pbIcon, value.ToString());
-
             }
-
         }
 
         private int drags;
@@ -56,16 +55,9 @@ namespace TaskBoardWf
             InitializeComponent();
 
             WindowHandle = hwnd;
-            //pbIcon = new PictureBox();
             pbIcon.Image = GetTaskIcon(hwnd).ToBitmap();
-
-            //StringBuilder tn = new StringBuilder(256);
-            //GetWindowText(hwnd, tn, tn.Capacity);
-            //taskName = tn;
-
             GetWindowText(hwnd, taskName, taskName.Capacity);
             TaskName = taskName;
-
         }
 
         public TaskUserControl()
@@ -89,6 +81,7 @@ namespace TaskBoardWf
         private const int SW_SHOWMINIMIZED = 2;
         private const int SW_SHOWMAXIMIZED = 3;
         private const int SW_RESTORE = 9;
+        private const int WM_CLOSE = 0x0010;
 
 
         [DllImport("user32.dll")]
@@ -112,6 +105,10 @@ namespace TaskBoardWf
 
         [DllImport("user32.dll")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
 
 
         private struct WINDOWPLACEMENT
@@ -152,10 +149,10 @@ namespace TaskBoardWf
                 return Icon.FromHandle(hIcon);
             }
 
-            string filePath = GetExePath(hWnd);
+            //string filePath = GetExePath(hWnd);
             try
             {
-                return Icon.ExtractAssociatedIcon(filePath);
+                return Icon.ExtractAssociatedIcon(GetExePath(hWnd));
             }
             catch (ArgumentException) { }
 
@@ -224,20 +221,22 @@ namespace TaskBoardWf
 
         private void TaskUserControl_MouseDown(object sender, MouseEventArgs e)
         {
+            BringToFront();
+
+            // If clicking unselected Task, select it and unselect others
+            if (!IsSelected)
+            {
+                foreach (var ctrl in Parent.Controls.OfType<TaskUserControl>())
+                {
+                    ctrl.IsSelected = false;
+                }
+                IsSelected = true;
+            }
+
             if (e.Button == MouseButtons.Left)
             {
-                BringToFront();
                 dragStart = e.Location;
 
-                // If clicking unselected Task, select it and unselect others
-                if (!IsSelected)
-                {
-                    foreach (var ctrl in Parent.Controls.OfType<TaskUserControl>())
-                    {
-                        ctrl.IsSelected = false;
-                    }
-                    IsSelected = true;
-                }
             }
         }
 
@@ -278,13 +277,49 @@ namespace TaskBoardWf
             // Gave up to use click event which cant handle dragging properly
             // Guessed that dragging is recognized by distance between original position and mouse e.location 
             // but the control moves with mouse when dragged and this makes the distance to 0
-
         }
 
-        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            foreach (var taskControl in Parent.Controls.OfType<TaskUserControl>())
+            {
+                if (taskControl.IsSelected)
+                {
+                    CloseTask(taskControl.WindowHandle);
+                }
+            }
 
-            
+            // Wait for closed process to be killed
+            await Task.Delay(200);
+            ((TaskBoard)Parent).Renew();
+        }
+
+        private void CloseTask(IntPtr hWnd)
+        {
+            SetForegroundTask(hWnd);
+
+            // Special operation for Excel window
+            var exeName = GetExePath(hWnd);
+            if (exeName.EndsWith("excel.exe", StringComparison.OrdinalIgnoreCase))
+            {
+                SendKeys.Send("^{F4}");
+            }
+            // Normal operation to close Task window
+            else
+            {
+                SendMessage(hWnd, WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
+            }
+        }
+
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (var taskControl in Parent.Controls.OfType<TaskUserControl>())
+            {
+                if (taskControl.IsSelected)
+                {
+                    SetForegroundTask(taskControl.WindowHandle);
+                }
+            }
         }
     }
 }

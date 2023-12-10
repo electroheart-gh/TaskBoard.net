@@ -210,7 +210,7 @@ namespace TaskBoardWf
         }
 
         // Update Task controls on the Board, delete obsolete Task controls and add new Task controls
-        private void Renew()
+        public void Renew()
         {
             var runningTasks = GetTaskHwndList();
             var taskToRemove = new List<TaskUserControl>();
@@ -229,13 +229,11 @@ namespace TaskBoardWf
                     taskToRemove.Add(taskControl);
                 }
             }
-
             // Dispose obsolete Task controls 
             foreach (var task in taskToRemove)
             {
                 task.Dispose();
             }
-
             // Add new tasks
             foreach (var newTask in runningTasks)
             {
@@ -243,9 +241,7 @@ namespace TaskBoardWf
                 newTaskControl.Location = ProposePosition();
                 Controls.Add(newTaskControl);
                 newTaskControl.BringToFront();
-
             }
-
             // TODO: Save tasks positions to recover the layout when restarting after crashes
         }
 
