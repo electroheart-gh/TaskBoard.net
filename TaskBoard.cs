@@ -13,7 +13,6 @@ namespace TaskBoardWf
     public partial class TaskBoard : Form
     {
         // TODO: write rubber band above the task icon 
-        // TODO: try global hot key with mouse button
 
         //
         // Variables for Rubber Band 
@@ -146,7 +145,7 @@ namespace TaskBoardWf
         [DllImport("user32.dll")]
         private static extern bool IsWindowVisible(IntPtr hWnd);
 
-        
+
 
 
         private static void DebugEnumerateWindows()
@@ -232,7 +231,7 @@ namespace TaskBoardWf
 
             foreach (var taskControl in Controls.OfType<TaskUserControl>())
             {
-                if (taskControl.Renew())
+                if (runningTasks.Contains(taskControl.WindowHandle) && taskControl.Renew())
                 {
                     // Remove updated tasks from the variable to extract new tasks
                     runningTasks.Remove(taskControl.WindowHandle);
