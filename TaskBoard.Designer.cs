@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TaskBoard));
             this.Board = new System.Windows.Forms.PictureBox();
             this.taskUserControl1 = new TaskBoardWf.TaskUserControl();
@@ -50,10 +51,13 @@
             // 
             // taskUserControl1
             // 
-            this.taskUserControl1.BackColor = System.Drawing.Color.Transparent;
+            this.taskUserControl1.BackColor = System.Drawing.SystemColors.Control;
+            this.taskUserControl1.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.taskUserControl1.IsSelected = false;
             this.taskUserControl1.Location = new System.Drawing.Point(525, 132);
+            this.taskUserControl1.Margin = new System.Windows.Forms.Padding(4);
             this.taskUserControl1.Name = "taskUserControl1";
+            this.taskUserControl1.Padding = new System.Windows.Forms.Padding(4);
             this.taskUserControl1.Size = new System.Drawing.Size(80, 80);
             this.taskUserControl1.TabIndex = 2;
             this.taskUserControl1.TaskName = ((System.Text.StringBuilder)(resources.GetObject("taskUserControl1.TaskName")));
@@ -67,6 +71,7 @@
             this.Controls.Add(this.Board);
             this.Name = "TaskBoard";
             this.Text = "TaskBoard";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TaskBoard_FormClosing);
             this.Load += new System.EventHandler(this.TaskBoard_Load);
             ((System.ComponentModel.ISupportInitialize)(this.Board)).EndInit();
             this.ResumeLayout(false);

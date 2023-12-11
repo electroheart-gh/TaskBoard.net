@@ -11,6 +11,9 @@ namespace TaskBoardWf
 {
     public partial class TaskUserControl : UserControl
     {
+        // TODO: Renew() checks not only existence of window hwnd but also the window status 
+        // TODO: Change TaskName as per config specifying exe name and strings
+
         //
         // Parameters and variables
         //

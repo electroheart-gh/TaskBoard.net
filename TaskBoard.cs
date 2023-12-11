@@ -5,29 +5,31 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace TaskBoardWf
 {
     public partial class TaskBoard : Form
     {
+        // TODO: write rubber band above the task icon 
+        // TODO: try global hot key with mouse button
 
         //
         // Variables for Rubber Band 
-        // TODO: write rubber band above the task icon 
         //
         bool isSelecting;
 
         Point rubberBandStart;
         Point rubberBandEnd;
 
-        // TODO: Change color according to control color
         Color lineColor = Color.Purple;   // Gray
         int lineBorder = 1;
 
         Graphics gRubberBand;
         Pen linePen;
 
+        HotKey hotKey;
 
         //
         // Constructor
@@ -48,7 +50,19 @@ namespace TaskBoardWf
             // Initialize displaying Task controls on the Board using Renew()
             Renew();
 
+            // Global Hot Key
+            hotKey = new HotKey(MOD_KEY.ALT, Keys.Q);  // Keys.MButton not work
+            hotKey.HotKeyPush += new EventHandler(hotKey_HotKeyPush);
+
             // TODO: Consider not to display the task board on the task bar
+        }
+
+        void hotKey_HotKeyPush(object sender, EventArgs e)
+        {
+            Activate();
+            BringToFront();
+            WindowState = FormWindowState.Maximized;
+            //MessageBox.Show("ホットキーが押されました。");
         }
 
         private void Board_MouseDown(object sender, MouseEventArgs e)
@@ -115,7 +129,6 @@ namespace TaskBoardWf
         private const long WS_EX_NOREDIRECTIONBITMAP = 0x00200000L;
         private const long WS_EX_TOOLWINDOW = 0x00000080L;
 
-
         private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
 
         [DllImport("user32.dll")]
@@ -132,6 +145,8 @@ namespace TaskBoardWf
 
         [DllImport("user32.dll")]
         private static extern bool IsWindowVisible(IntPtr hWnd);
+
+        
 
 
         private static void DebugEnumerateWindows()
@@ -273,5 +288,102 @@ namespace TaskBoardWf
             linePen.Dispose();
             gRubberBand.Dispose();
         }
+
+        private void TaskBoard_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            hotKey.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// グローバルホットキーを登録するクラス。
+    /// 使用後は必ずDisposeすること。
+    /// </summary>
+    public class HotKey : IDisposable
+    {
+        HotKeyForm form;
+        /// <summary>
+        /// ホットキーが押されると発生する。
+        /// </summary>
+        public event EventHandler HotKeyPush;
+
+        /// <summary>
+        /// ホットキーを指定して初期化する。
+        /// 使用後は必ずDisposeすること。
+        /// </summary>
+        /// <param name="modKey">修飾キー</param>
+        /// <param name="key">キー</param>
+        public HotKey(MOD_KEY modKey, Keys key)
+        {
+            form = new HotKeyForm(modKey, key, raiseHotKeyPush);
+        }
+
+        private void raiseHotKeyPush()
+        {
+            if (HotKeyPush != null)
+            {
+                HotKeyPush(this, EventArgs.Empty);
+            }
+        }
+
+        public void Dispose()
+        {
+            form.Dispose();
+        }
+
+        private class HotKeyForm : Form
+        {
+            [DllImport("user32.dll")]
+            extern static int RegisterHotKey(IntPtr HWnd, int ID, MOD_KEY MOD_KEY, Keys KEY);
+
+            [DllImport("user32.dll")]
+            extern static int UnregisterHotKey(IntPtr HWnd, int ID);
+
+            const int WM_HOTKEY = 0x0312;
+            int id;
+            ThreadStart proc;
+
+            public HotKeyForm(MOD_KEY modKey, Keys key, ThreadStart proc)
+            {
+                this.proc = proc;
+                for (int i = 0x0000; i <= 0xbfff; i++)
+                {
+                    if (RegisterHotKey(this.Handle, i, modKey, key) != 0)
+                    {
+                        id = i;
+                        break;
+                    }
+                }
+            }
+
+            protected override void WndProc(ref Message m)
+            {
+                base.WndProc(ref m);
+
+                if (m.Msg == WM_HOTKEY)
+                {
+                    if ((int)m.WParam == id)
+                    {
+                        proc();
+                    }
+                }
+            }
+
+            protected override void Dispose(bool disposing)
+            {
+                UnregisterHotKey(this.Handle, id);
+                base.Dispose(disposing);
+            }
+        }
+    }
+
+    /// <summary>
+    /// HotKeyクラスの初期化時に指定する修飾キー
+    /// </summary>
+    public enum MOD_KEY : int
+    {
+        ALT = 0x0001,
+        CONTROL = 0x0002,
+        SHIFT = 0x0004,
     }
 }
