@@ -16,7 +16,38 @@ namespace TaskBoardWf
         //
         // Parameters and variables
         //
-        public IntPtr WindowHandle { get; set; }
+        private IntPtr windowHandle;
+
+        public IntPtr WindowHandle
+        {
+            get { return windowHandle; }
+            set
+            {
+                windowHandle = value;
+                pbIcon.Image = GetTaskIcon(value).ToBitmap();
+                GetWindowText(value, taskName, taskName.Capacity);
+                TaskName = taskName;
+                lblTaskName.Text = taskName.ToString();
+
+                // Due to performance issue, gave up to add exe name to the tooltips
+                var stringToolTip = taskName.ToString();
+                toolTipTaskName.SetToolTip(this, stringToolTip);
+                toolTipTaskName.SetToolTip(lblTaskName, stringToolTip);
+                toolTipTaskName.SetToolTip(pbIcon, stringToolTip);
+            }
+        }
+
+        private StringBuilder taskName = new StringBuilder(256);
+        public StringBuilder TaskName
+        {
+            get { return taskName; }
+            set
+            {
+                taskName = value;
+                lblTaskName.Text = value.ToString();
+            }
+        }
+
 
         private bool isSelected;
         public bool IsSelected
@@ -30,21 +61,6 @@ namespace TaskBoardWf
             }
         }
 
-
-        private StringBuilder taskName = new StringBuilder(256);
-        public StringBuilder TaskName
-        {
-            get { return taskName; }
-            set
-            {
-                taskName = value;
-                lblTaskName.Text = value.ToString();
-                toolTipTaskName.SetToolTip(this, value.ToString());
-                toolTipTaskName.SetToolTip(lblTaskName, value.ToString());
-                toolTipTaskName.SetToolTip(pbIcon, value.ToString());
-            }
-        }
-
         private int drags;
         private Point dragStart;
 
@@ -55,11 +71,7 @@ namespace TaskBoardWf
         public TaskUserControl(IntPtr hwnd)
         {
             InitializeComponent();
-
             WindowHandle = hwnd;
-            pbIcon.Image = GetTaskIcon(hwnd).ToBitmap();
-            GetWindowText(hwnd, taskName, taskName.Capacity);
-            TaskName = taskName;
         }
 
         public TaskUserControl()
@@ -87,7 +99,6 @@ namespace TaskBoardWf
 
 
         [DllImport("user32.dll")]
-
         private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
         [DllImport("user32.dll")]
@@ -110,7 +121,6 @@ namespace TaskBoardWf
 
         [DllImport("user32.dll")]
         private static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
-
 
 
         private struct WINDOWPLACEMENT
@@ -151,7 +161,6 @@ namespace TaskBoardWf
                 return Icon.FromHandle(hIcon);
             }
 
-            //string filePath = GetExePath(hWnd);
             try
             {
                 return Icon.ExtractAssociatedIcon(GetExePath(hWnd));
@@ -163,6 +172,8 @@ namespace TaskBoardWf
 
         private static string GetExePath(IntPtr hWnd)
         {
+            if (hWnd == IntPtr.Zero) { return null; }
+
             try
             {
                 GetWindowThreadProcessId(hWnd, out uint processId);
@@ -171,33 +182,31 @@ namespace TaskBoardWf
             }
             catch (ArgumentException)
             {
-                return null;
+                return string.Empty;
             }
             catch (InvalidOperationException)
             {
-                return null;
+                return string.Empty;
+            }
+            // To handle access privilege error from Chrome etc, catch Win32Exception
+            catch (System.ComponentModel.Win32Exception)
+            {
+                return string.Empty;
             }
         }
+
 
         //
         // Methods for display control
         //
 
-        // Update task name of Task control
-        internal bool Renew()
+        // Update task name and icon of Task control by setting windowHandle to windowHandle
+        public void Renew()
         {
-            StringBuilder tn = new StringBuilder(256);
-            if (GetWindowText(WindowHandle, tn, tn.Capacity) == 0)
-            {
-                lblTaskName.ForeColor = Color.Red;
-                return false;
-            }
-            TaskName = tn;
-            return true;
+            WindowHandle = windowHandle;
         }
 
         // Foreground window for the task
-
         private void SetForegroundTask(IntPtr hWnd)
         {
             var placement = new WINDOWPLACEMENT();
@@ -217,6 +226,7 @@ namespace TaskBoardWf
             SetForegroundWindow(hWnd);
         }
 
+
         //
         // Event handlers
         //
@@ -234,17 +244,14 @@ namespace TaskBoardWf
                 }
                 IsSelected = true;
             }
-
             if (e.Button == MouseButtons.Left)
             {
                 dragStart = e.Location;
-
             }
         }
 
         private void TaskUserControl_MouseMove(object sender, MouseEventArgs e)
         {
-
             if (e.Button == MouseButtons.Left)
             {
                 // Count how many times it is dragged between MouseDown and MouseUp
@@ -255,7 +262,6 @@ namespace TaskBoardWf
                     if (ctrl.IsSelected)
                     {
                         ctrl.Location = new Point(ctrl.Location.X + e.Location.X - dragStart.X, ctrl.Location.Y + e.Location.Y - dragStart.Y);
-
                     }
                 }
             }
@@ -290,7 +296,6 @@ namespace TaskBoardWf
                     CloseTask(taskControl.WindowHandle);
                 }
             }
-
             // Wait for closed process to be killed
             await Task.Delay(200);
             ((TaskBoard)Parent).Renew();
@@ -322,6 +327,13 @@ namespace TaskBoardWf
                     SetForegroundTask(taskControl.WindowHandle);
                 }
             }
+        }
+
+        private void detailsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var message = TaskName.ToString();
+            message += Environment.NewLine + GetExePath(windowHandle);
+            MessageBox.Show(message);
         }
     }
 }

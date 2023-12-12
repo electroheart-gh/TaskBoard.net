@@ -231,10 +231,11 @@ namespace TaskBoardWf
 
             foreach (var taskControl in Controls.OfType<TaskUserControl>())
             {
-                if (runningTasks.Contains(taskControl.WindowHandle) && taskControl.Renew())
+                if (runningTasks.Contains(taskControl.WindowHandle))
                 {
-                    // Remove updated tasks from the variable to extract new tasks
+                    // Remove existing Task controls from the variable to extract new tasks
                     runningTasks.Remove(taskControl.WindowHandle);
+                    taskControl.Renew();
                 }
                 else
                 {
@@ -293,6 +294,8 @@ namespace TaskBoardWf
             hotKey.Dispose();
         }
     }
+
+
 
     /// <summary>
     /// グローバルホットキーを登録するクラス。
