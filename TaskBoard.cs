@@ -13,6 +13,7 @@ namespace TaskBoardWf
     public partial class TaskBoard : Form
     {
         // TODO: write rubber band above the task icon 
+        // TODO: Make it scalable and scrollable
 
         //
         // Variables for Rubber Band 
@@ -164,7 +165,7 @@ namespace TaskBoardWf
         }
 
         // Get window handles of the windows on the taskbar
-        private static List<IntPtr> GetTaskHwndList()
+        public static List<IntPtr> GetTaskHwndList()
         {
             var taskListAsHwnd = new List<IntPtr>();
 

@@ -201,9 +201,18 @@ namespace TaskBoardWf
         //
 
         // Update task name and icon of Task control by setting windowHandle to windowHandle
-        public void Renew()
+        public bool Renew()
         {
-            WindowHandle = windowHandle;
+            if (TaskBoard.GetTaskHwndList().Contains(windowHandle))
+            {
+                WindowHandle = windowHandle;
+                return true;
+            }
+            else
+            {
+                lblTaskName.ForeColor = Color.Red;
+                return false;
+            }
         }
 
         // Foreground window for the task
