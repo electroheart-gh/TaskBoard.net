@@ -35,7 +35,5 @@ namespace TaskBoardWf
         {
             NameModifiers = new List<NameModifier>();
         }
-
-
     }
 }

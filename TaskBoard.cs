@@ -17,7 +17,6 @@ namespace TaskBoardWf
         // TODO: write rubber band above the task icon 
         // TODO: Make it scalable and scrollable
         // TODO: Implement keyboard interface
-        // TODO: Specify color by string in setting
 
         //
         // Variables for Rubber Band 
@@ -34,7 +33,6 @@ namespace TaskBoardWf
         Pen linePen;
 
         HotKey hotKey;
-
 
 
         //

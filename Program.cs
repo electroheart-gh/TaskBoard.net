@@ -6,6 +6,7 @@ namespace TaskBoardWf
 {
     internal static class Program
     {
+        // Global variable for configuration
         static public AppSettings appSettings = new AppSettings();
 
         /// <summary>
@@ -14,32 +15,9 @@ namespace TaskBoardWf
         [STAThread]
         static void Main()
         {
+            // Read configuration
             var settingsManager = new SettingsManager();
-
-            // 設定を読み込む代わりにSET
-            //var nameMod = new AppSettings.NameModifier();
-            //nameMod.Pattern = "Steam";
-            //nameMod.Substitution = "Steam!";
-            //nameMod.ForeColor = "GreenYellow";
-            //appSettings.NameModifiers.Add(nameMod);
-
-            //appSettings.NameModifiers.Add(new AppSettings.NameModifier { Pattern = "Steam", Substitution = "Steam!!!", ForeColor = "GreenYellow"});
-            //appSettings.NameModifiers.Add(new AppSettings.NameModifier { Pattern = "Task", Substitution = "", ForeColor = "Blue" });
-
-            //settingsManager.SaveSettings(appSettings);
-
-            // 設定を読み込み
             appSettings = settingsManager.LoadSettings<AppSettings>();
-
-            //if (appSettings!= null)
-            //{
-            //    foreach (var nm in appSettings.NameModifiers)
-            //    {
-            //        Console.WriteLine($"Loaded settings - Pattern: {nm.Pattern}, Sub: {nm.Substitution}");
-            //    }
-            //}
-
-
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

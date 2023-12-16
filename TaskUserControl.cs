@@ -40,8 +40,6 @@ namespace TaskBoardWf
             set
             {
                 taskName = value;
-                // TODO: Change lblTaskName as per config specifying exe name and strings, except TaskName and Tooltip
-                // TODO: should be modified by ModifyTaskName();
                 lblTaskName.Text = ModifyName(value);
                 lblTaskName.ForeColor= ModifyNameColor(value);
 
