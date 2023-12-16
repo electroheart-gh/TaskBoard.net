@@ -25,9 +25,9 @@ namespace TaskBoardWf
 
             public NameModifier() 
             {
-                Pattern = "";
+                Pattern = string.Empty;
                 Substitution = string.Empty;
-                ForeColor = "Black";
+                ForeColor = string.Empty;
             }
         }
 

@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Linq;
 
 namespace TaskBoardWf
 {
@@ -28,34 +29,10 @@ namespace TaskBoardWf
                 GetWindowText(value, tn, tn.Capacity);
                 TaskName = tn.ToString();
 
-                // TODO: Change lblTaskName as per config specifying exe name and strings, except TaskName and Tooltip
-                lblTaskName.Text = taskName;
-                ModifyTaskName();
-
-                // Due to performance issue, gave up to add exe name to the tooltips
-                var stringToolTip = taskName;
-                toolTipTaskName.SetToolTip(this, stringToolTip);
-                toolTipTaskName.SetToolTip(lblTaskName, stringToolTip);
-                toolTipTaskName.SetToolTip(pbIcon, stringToolTip);
             }
         }
 
-        private void ModifyTaskName()
-        {
-            //var tn = taskName.ToString();
-            foreach (var nm in Program.appSettings.NameModifiers)
-            {
-                if (Regex.IsMatch(taskName,nm.Pattern))
-                {
-                    if (nm.Substitution!=null)
-                    {
-                        taskName = Regex.Replace(taskName, nm.Pattern, nm.Substitution);
-                    }
-                }
-            }
-        }
-
-
+        
         private String taskName;
         public String TaskName
         {
@@ -63,8 +40,39 @@ namespace TaskBoardWf
             set
             {
                 taskName = value;
-                lblTaskName.Text = value;
+                // TODO: Change lblTaskName as per config specifying exe name and strings, except TaskName and Tooltip
+                // TODO: should be modified by ModifyTaskName();
+                lblTaskName.Text = ModifyName(value);
+                lblTaskName.ForeColor= ModifyNameColor(value);
+
+                // Due to performance issue, gave up to add exe name to the tooltips
+                toolTipTaskName.SetToolTip(this, taskName);
+                toolTipTaskName.SetToolTip(lblTaskName, taskName);
+                toolTipTaskName.SetToolTip(pbIcon, taskName);
+
             }
+        }
+
+        private Color ModifyNameColor(string name)
+        {
+            var color = new Color();
+            foreach (var nm in Program.appSettings.NameModifiers)
+            {
+                if (Regex.IsMatch(name, nm.Pattern))
+                {
+                    color = Color.FromName(nm.ForeColor);
+                }
+            }
+            return color;
+        }
+
+        private string ModifyName(string name)
+        {
+            foreach (var nm in Program.appSettings.NameModifiers)
+            {
+                name = Regex.Replace(name, nm.Pattern, nm.Substitution);
+            }
+            return name;
         }
 
 
