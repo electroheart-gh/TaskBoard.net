@@ -1,0 +1,29 @@
+{
+  "NameModifiers": [
+    {
+      "Pattern": "Steam",
+      "Substitution": "Steam!",
+      "ForeColor": "MediumBlue"
+    },
+    {
+      "Pattern": "Steam",
+      "Substitution": "Steam!!",
+      "ForeColor": "MediumBlue"
+    },
+    {
+      "Pattern": "Task",
+      "Substitution": "Task",
+      "ForeColor": "Green"
+    },
+    {
+      "Pattern": "^DES(.*Chrome$)",
+      "Substitution": "$1",
+      "ForeColor": "Blue"
+    },
+    {
+      "Pattern": "^コミュニケーション サイト - (.*Edge$)",
+      "Substitution": "$1",
+      "ForeColor": "Blue"
+    }
+  ]
+}
