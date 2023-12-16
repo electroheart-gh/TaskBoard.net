@@ -31,7 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TaskBoard));
             this.Board = new System.Windows.Forms.PictureBox();
-            this.taskUserControl1 = new TaskBoardWf.TaskUserControl();
+            //this.taskUserControl1 = new TaskBoardWf.TaskUserControl();
             ((System.ComponentModel.ISupportInitialize)(this.Board)).BeginInit();
             this.SuspendLayout();
             // 
@@ -51,16 +51,16 @@
             // 
             // taskUserControl1
             // 
-            this.taskUserControl1.BackColor = System.Drawing.SystemColors.Control;
-            this.taskUserControl1.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.taskUserControl1.IsSelected = false;
-            this.taskUserControl1.Location = new System.Drawing.Point(525, 132);
-            this.taskUserControl1.Margin = new System.Windows.Forms.Padding(4);
-            this.taskUserControl1.Name = "taskUserControl1";
-            this.taskUserControl1.Padding = new System.Windows.Forms.Padding(4);
-            this.taskUserControl1.Size = new System.Drawing.Size(80, 80);
-            this.taskUserControl1.TabIndex = 2;
-            this.taskUserControl1.TaskName = ((System.Text.StringBuilder)(resources.GetObject("taskUserControl1.TaskName")));
+            //this.taskUserControl1.BackColor = System.Drawing.SystemColors.Control;
+            //this.taskUserControl1.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            //this.taskUserControl1.IsSelected = false;
+            //this.taskUserControl1.Location = new System.Drawing.Point(525, 132);
+            //this.taskUserControl1.Margin = new System.Windows.Forms.Padding(4);
+            //this.taskUserControl1.Name = "taskUserControl1";
+            //this.taskUserControl1.Padding = new System.Windows.Forms.Padding(4);
+            //this.taskUserControl1.Size = new System.Drawing.Size(80, 80);
+            //this.taskUserControl1.TabIndex = 2;
+            //this.taskUserControl1.TaskName = ((System.Text.StringBuilder)(resources.GetObject("taskUserControl1.TaskName")));
 // TODO: Code generation for '' failed because of Exception 'Invalid Primitive Type: System.IntPtr. Consider using CodeObjectCreateExpression.'.
             // 
             // TaskBoard
