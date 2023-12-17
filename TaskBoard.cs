@@ -14,7 +14,7 @@ namespace TaskBoardWf
 {
     public partial class TaskBoard : Form
     {
-        // TODO: write rubber band above the task icon 
+        // TODO: Consider to write rubber band above the task icon 
         // TODO: Make it scalable and scrollable
         // TODO: Implement keyboard interface
 
@@ -67,62 +67,6 @@ namespace TaskBoardWf
             Activate();
             BringToFront();
             WindowState = FormWindowState.Maximized;
-            //MessageBox.Show("ホットキーが押されました。");
-        }
-
-        private void Board_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                Renew();
-                rubberBandStart = PointToClient(Cursor.Position);
-                isSelecting = true;
-                foreach (var taskControl in Controls.OfType<TaskUserControl>())
-                {
-                    taskControl.IsSelected = false;
-                }
-            }
-        }
-
-        private void Board_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (isSelecting)
-            {
-                rubberBandEnd = PointToClient(Cursor.Position);
-
-                // Draw rubber band
-                Point p0 = new Point(rubberBandStart.X, rubberBandStart.Y);
-                Point p1 = new Point(rubberBandEnd.X, rubberBandStart.Y);
-                Point p2 = new Point(rubberBandStart.X, rubberBandEnd.Y);
-                Point p3 = new Point(rubberBandEnd.X, rubberBandEnd.Y);
-                DrawQuadLine(p0, p1, p2, p3);
-
-                // Check overlapped Task controls with rubber band
-                var rectRB = RectangleExt.Create(rubberBandStart, rubberBandEnd);
-
-                foreach (var taskControl in Controls.OfType<TaskUserControl>())
-                {
-                    if (new Rectangle(taskControl.Location, taskControl.Size).IntersectsWith(rectRB))
-                    {
-                        taskControl.IsSelected = true;
-                    }
-                    else
-                    {
-                        taskControl.IsSelected = false;
-                    }
-                }
-            }
-        }
-
-        private void Board_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                // Erase rubber band
-                // TODO: !!!! Change Board control to Rubber band control to minimize its size for memory usage etc.
-                RubberBandBox.Image = new Bitmap(RubberBandBox.Width, RubberBandBox.Height);
-                isSelecting = false;
-            }
         }
 
 
@@ -253,32 +197,6 @@ namespace TaskBoardWf
         //
         // Methods for rubber band
         //
-
-        // Draw quad line
-        // TODO: !!!! Change size and place of picture box for RubberBand
-        private void DrawQuadLine(Point p0, Point p1, Point p2, Point p3)
-        {
-            // Specifying nothing but the size creates noncolor canvas 
-            var rubberBandBitmap = new Bitmap(RubberBandBox.Width, RubberBandBox.Height);
-
-            // Create Graphics object for the rubber band
-            gRubberBand = Graphics.FromImage(rubberBandBitmap);
-
-            linePen = new Pen(lineColor, lineBorder);
-            linePen.DashStyle = DashStyle.Dot;
-
-            gRubberBand.DrawLine(linePen, p0, p1); // top
-            gRubberBand.DrawLine(linePen, p2, p3); // bottom
-            gRubberBand.DrawLine(linePen, p0, p2); // left
-            gRubberBand.DrawLine(linePen, p1, p3); // right
-
-            RubberBandBox.Image = rubberBandBitmap;
-
-            // Release resources
-            linePen.Dispose();
-            gRubberBand.Dispose();
-        }
-
         private void TaskBoard_FormClosing(object sender, FormClosingEventArgs e)
         {
             hotKey.Dispose();
@@ -302,12 +220,11 @@ namespace TaskBoardWf
         {
             if (isSelecting)
             {
+                // Draw rubber band
                 rubberBandEnd = PointToClient(Cursor.Position);
                 RubberBandBox.Bounds = RectangleExt.Create(rubberBandStart, rubberBandEnd);
 
-                // Draw rubber band
                 // Specifying nothing but the size creates noncolor canvas 
-                //var rubberBandBitmap = new Bitmap(Math.Max(RubberBandBox.Width, 1), Math.Max(RubberBandBox.Height, 1));
                 // To avoid 0 width/height, which makes an error, add +1 to Width and Height
                 var rubberBandBitmap = new Bitmap(RubberBandBox.Width + 1, RubberBandBox.Height + 1);
 
@@ -326,18 +243,7 @@ namespace TaskBoardWf
                 linePen.Dispose();
                 gRubberBand.Dispose();
 
-                // Draw rubber band
-                //Point p0 = new Point(rubberBandStart.X, rubberBandStart.Y);
-                //Point p1 = new Point(rubberBandEnd.X, rubberBandStart.Y);
-                //Point p2 = new Point(rubberBandStart.X, rubberBandEnd.Y);
-                //Point p3 = new Point(rubberBandEnd.X, rubberBandEnd.Y);
-
-                // TODO: !!!! Change size and place of picture box for RubberBand
-                // DrawQuadLine(p0, p1, p2, p3);
-
                 // Check overlapped Task controls with rubber band
-                //var rectRB = RectangleExt.Create(rubberBandStart, rubberBandEnd);
-
                 foreach (var taskControl in Controls.OfType<TaskUserControl>())
                 {
                     if (new Rectangle(taskControl.Location, taskControl.Size).IntersectsWith(RubberBandBox.Bounds))
@@ -357,8 +263,9 @@ namespace TaskBoardWf
             if (e.Button == MouseButtons.Left)
             {
                 // Erase rubber band
-                // TODO: Change Board control to Rubber band control to minimize its size for memory usage etc.
+                // To avoid 0 width/height, which makes an error, add +1 to Width and Height
                 RubberBandBox.Image = new Bitmap(RubberBandBox.Width + 1, RubberBandBox.Height + 1);
+                // Disable to click Rubber Band Box
                 RubberBandBox.Enabled = false;
 
                 isSelecting = false;

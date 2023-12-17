@@ -264,7 +264,6 @@ namespace TaskBoardWf
         //
         // Event handlers
         //
-
         private void TaskUserControl_MouseDown(object sender, MouseEventArgs e)
         {
             BringToFront();
@@ -300,7 +299,6 @@ namespace TaskBoardWf
                 }
             }
         }
-
         private void TaskUserControl_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
