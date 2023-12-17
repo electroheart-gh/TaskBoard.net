@@ -28,59 +28,41 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TaskBoard));
-            this.Board = new System.Windows.Forms.PictureBox();
-            //this.taskUserControl1 = new TaskBoardWf.TaskUserControl();
-            ((System.ComponentModel.ISupportInitialize)(this.Board)).BeginInit();
+            this.RubberBandBox = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.RubberBandBox)).BeginInit();
             this.SuspendLayout();
             // 
-            // Board
+            // RubberBandBox
             // 
-            this.Board.BackColor = System.Drawing.SystemColors.Control;
-            this.Board.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Board.Location = new System.Drawing.Point(0, 0);
-            this.Board.Name = "Board";
-            this.Board.Size = new System.Drawing.Size(922, 595);
-            this.Board.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.Board.TabIndex = 0;
-            this.Board.TabStop = false;
-            this.Board.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Board_MouseDown);
-            this.Board.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Board_MouseMove);
-            this.Board.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Board_MouseUp);
-            // 
-            // taskUserControl1
-            // 
-            //this.taskUserControl1.BackColor = System.Drawing.SystemColors.Control;
-            //this.taskUserControl1.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            //this.taskUserControl1.IsSelected = false;
-            //this.taskUserControl1.Location = new System.Drawing.Point(525, 132);
-            //this.taskUserControl1.Margin = new System.Windows.Forms.Padding(4);
-            //this.taskUserControl1.Name = "taskUserControl1";
-            //this.taskUserControl1.Padding = new System.Windows.Forms.Padding(4);
-            //this.taskUserControl1.Size = new System.Drawing.Size(80, 80);
-            //this.taskUserControl1.TabIndex = 2;
-            //this.taskUserControl1.TaskName = ((System.Text.StringBuilder)(resources.GetObject("taskUserControl1.TaskName")));
-// TODO: Code generation for '' failed because of Exception 'Invalid Primitive Type: System.IntPtr. Consider using CodeObjectCreateExpression.'.
+            this.RubberBandBox.BackColor = System.Drawing.Color.Transparent;
+            this.RubberBandBox.Location = new System.Drawing.Point(10, 10);
+            this.RubberBandBox.Name = "RubberBandBox";
+            this.RubberBandBox.Size = new System.Drawing.Size(10, 10);
+            this.RubberBandBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.RubberBandBox.TabIndex = 0;
+            this.RubberBandBox.TabStop = false;
             // 
             // TaskBoard
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(922, 595);
-            this.Controls.Add(this.Board);
+            this.Controls.Add(this.RubberBandBox);
             this.Name = "TaskBoard";
             this.Text = "TaskBoard";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TaskBoard_FormClosing);
             this.Load += new System.EventHandler(this.TaskBoard_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.Board)).EndInit();
+            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TaskBoard_MouseDown);
+            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.TaskBoard_MouseMove);
+            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TaskBoard_MouseUp);
+            ((System.ComponentModel.ISupportInitialize)(this.RubberBandBox)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.PictureBox Board;
+        private System.Windows.Forms.PictureBox RubberBandBox;
         private TaskBoardWf.TaskUserControl taskUserControl1;
     }
 }

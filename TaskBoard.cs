@@ -26,7 +26,7 @@ namespace TaskBoardWf
         Point rubberBandStart;
         Point rubberBandEnd;
 
-        Color lineColor = Color.Purple;   // Gray
+        Color lineColor = Color.Purple;   // or Gray
         int lineBorder = 1;
 
         Graphics gRubberBand;
@@ -119,8 +119,8 @@ namespace TaskBoardWf
             if (e.Button == MouseButtons.Left)
             {
                 // Erase rubber band
-                // TODO: Change Board control to Rubber band control to minimize its size for memory usage etc.
-                Board.Image = new Bitmap(Board.Width, Board.Height);
+                // TODO: !!!! Change Board control to Rubber band control to minimize its size for memory usage etc.
+                RubberBandBox.Image = new Bitmap(RubberBandBox.Width, RubberBandBox.Height);
                 isSelecting = false;
             }
         }
@@ -255,10 +255,11 @@ namespace TaskBoardWf
         //
 
         // Draw quad line
+        // TODO: !!!! Change size and place of picture box for RubberBand
         private void DrawQuadLine(Point p0, Point p1, Point p2, Point p3)
         {
             // Specifying nothing but the size creates noncolor canvas 
-            var rubberBandBitmap = new Bitmap(Board.Width, Board.Height);
+            var rubberBandBitmap = new Bitmap(RubberBandBox.Width, RubberBandBox.Height);
 
             // Create Graphics object for the rubber band
             gRubberBand = Graphics.FromImage(rubberBandBitmap);
@@ -271,7 +272,7 @@ namespace TaskBoardWf
             gRubberBand.DrawLine(linePen, p0, p2); // left
             gRubberBand.DrawLine(linePen, p1, p3); // right
 
-            Board.Image = rubberBandBitmap;
+            RubberBandBox.Image = rubberBandBitmap;
 
             // Release resources
             linePen.Dispose();
@@ -282,10 +283,86 @@ namespace TaskBoardWf
         {
             hotKey.Dispose();
         }
+
+        private void TaskBoard_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                Renew();
+                rubberBandStart = PointToClient(Cursor.Position);
+                isSelecting = true;
+                foreach (var taskControl in Controls.OfType<TaskUserControl>())
+                {
+                    taskControl.IsSelected = false;
+                }
+            }
+        }
+
+        private void TaskBoard_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (isSelecting)
+            {
+                rubberBandEnd = PointToClient(Cursor.Position);
+                RubberBandBox.Bounds = RectangleExt.Create(rubberBandStart, rubberBandEnd);
+
+                // Draw rubber band
+                // Specifying nothing but the size creates noncolor canvas 
+                //var rubberBandBitmap = new Bitmap(Math.Max(RubberBandBox.Width, 1), Math.Max(RubberBandBox.Height, 1));
+                // To avoid 0 width/height, which makes an error, add +1 to Width and Height
+                var rubberBandBitmap = new Bitmap(RubberBandBox.Width + 1, RubberBandBox.Height + 1);
+
+                // Create Graphics object for the rubber band
+                gRubberBand = Graphics.FromImage(rubberBandBitmap);
+
+                linePen = new Pen(lineColor, lineBorder);
+                linePen.DashStyle = DashStyle.Dot;
+                // To show the right and bottom lines, DrawRectangle should be -1, which is not related to the size of Bitmap mentioned above
+                gRubberBand.DrawRectangle(linePen, 0, 0, RubberBandBox.Width - 1, RubberBandBox.Height - 1);
+
+                RubberBandBox.Image = rubberBandBitmap;
+                RubberBandBox.Enabled = true;
+
+                // Release resources
+                linePen.Dispose();
+                gRubberBand.Dispose();
+
+                // Draw rubber band
+                //Point p0 = new Point(rubberBandStart.X, rubberBandStart.Y);
+                //Point p1 = new Point(rubberBandEnd.X, rubberBandStart.Y);
+                //Point p2 = new Point(rubberBandStart.X, rubberBandEnd.Y);
+                //Point p3 = new Point(rubberBandEnd.X, rubberBandEnd.Y);
+
+                // TODO: !!!! Change size and place of picture box for RubberBand
+                // DrawQuadLine(p0, p1, p2, p3);
+
+                // Check overlapped Task controls with rubber band
+                //var rectRB = RectangleExt.Create(rubberBandStart, rubberBandEnd);
+
+                foreach (var taskControl in Controls.OfType<TaskUserControl>())
+                {
+                    if (new Rectangle(taskControl.Location, taskControl.Size).IntersectsWith(RubberBandBox.Bounds))
+                    {
+                        taskControl.IsSelected = true;
+                    }
+                    else
+                    {
+                        taskControl.IsSelected = false;
+                    }
+                }
+            }
+        }
+
+        private void TaskBoard_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                // Erase rubber band
+                // TODO: Change Board control to Rubber band control to minimize its size for memory usage etc.
+                RubberBandBox.Image = new Bitmap(RubberBandBox.Width + 1, RubberBandBox.Height + 1);
+                RubberBandBox.Enabled = false;
+
+                isSelecting = false;
+            }
+        }
     }
-
-
-
-
-
 }
