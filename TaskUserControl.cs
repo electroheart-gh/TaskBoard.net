@@ -5,11 +5,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Linq;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace TaskBoardWf
 {
@@ -67,7 +64,6 @@ namespace TaskBoardWf
             return name;
         }
 
-
         private bool isSelected;
         public bool IsSelected
         {
@@ -118,8 +114,9 @@ namespace TaskBoardWf
 
         private const int PW_RENDERFULLCONTENT = 2;
 
-        private const int GWL_STYLE = -16;
-        private const int WS_DISABLED = 0x08000000;
+        //private const int GWL_STYLE = -16;
+        //private const int WS_DISABLED = 0x08000000;
+        //private const int WM_SETREDRAW = 0x000B;
 
 
         [DllImport("user32.dll")]
@@ -140,14 +137,18 @@ namespace TaskBoardWf
         [DllImport("user32.dll")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
 
-        [DllImport("user32.dll")]
-        private static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+        //[DllImport("user32.dll")]
+        //private static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
-        [DllImport("user32.dll")]
-        private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+        //[DllImport("user32.dll")]
+        //[return: MarshalAs(UnmanagedType.Bool)]
+        //private static extern bool SendMessage(IntPtr hWnd, int Msg, bool wParam, int lParam);
 
-        [DllImport("user32.dll")]
-        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+        //[DllImport("user32.dll")]
+        //private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+        //[DllImport("user32.dll")]
+        //private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
 
         [DllImport("user32.dll")]
         private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
@@ -364,53 +365,23 @@ namespace TaskBoardWf
             var placement = new WINDOWPLACEMENT();
             placement.length = Marshal.SizeOf(placement);
             GetWindowPlacement(WindowHandle, ref placement);
+            
             if ((placement.showCmd & SW_SHOWMINIMIZED) == SW_SHOWMINIMIZED) {
-
-                int orgStyle = GetWindowLong(WindowHandle, GWL_STYLE);
-                SetWindowLong(WindowHandle, GWL_STYLE, orgStyle | WS_DISABLED);
-
                 if ((placement.flags & WPF_RESTORETOMAXIMIZED) == WPF_RESTORETOMAXIMIZED) {
                     ShowWindow(WindowHandle, SW_SHOWMAXIMIZED);
                 }
                 else {
-                    //ShowWindow(WindowHandle, SW_HIDE);
                     ShowWindow(WindowHandle, SW_RESTORE);
                 }
-
-                int newStyle = GetWindowLong(WindowHandle, GWL_STYLE);
-                SetWindowLong(WindowHandle, GWL_STYLE, newStyle & ~WS_DISABLED);
-
             }
 
-            //Bitmap screenshot = CaptureWindow(WindowHandle);
-            //Bitmap screenshot = CaptureWindowSmallImage(WindowHandle);
             Bitmap screenshot = ResizeImage(CaptureWindow(WindowHandle));
             Parent.BackgroundImage = screenshot;
             SetForegroundWindow(Parent.Handle);
-
-        }
-        private Bitmap CaptureWindowSmallImage(IntPtr hWnd)
-        {
-            GetWindowRect(hWnd, out RECT rect);
-
-            int newWidth = (int)(rect.Right - rect.Left * 0.8);
-            int newHeight = (int)(rect.Bottom - rect.Top * 0.8);
-
-            //Bitmap bitmap = new Bitmap(rect.Right - rect.Left, rect.Bottom - rect.Top);
-            Bitmap bitmap = new Bitmap(newHeight, newWidth);
-
-            using (Graphics g = Graphics.FromImage(bitmap)) {
-                IntPtr hdc = g.GetHdc();
-                PrintWindow(hWnd, hdc, PW_RENDERFULLCONTENT);
-                g.ReleaseHdc(hdc);
-            }
-            return bitmap;
         }
 
         private Bitmap CaptureWindow(IntPtr hWnd)
         {
-
-
             GetWindowRect(hWnd, out RECT rect);
             Bitmap bitmap = new Bitmap(rect.Right - rect.Left, rect.Bottom - rect.Top);
             using (Graphics g = Graphics.FromImage(bitmap)) {
@@ -433,7 +404,6 @@ namespace TaskBoardWf
             }
             return resizedImage;
         }
-
 
         private void TaskUserControl_MouseLeave(object sender, EventArgs e)
         {
