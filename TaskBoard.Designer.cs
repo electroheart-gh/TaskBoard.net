@@ -46,10 +46,12 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.ClientSize = new System.Drawing.Size(922, 595);
             this.Controls.Add(this.RubberBandBox);
             this.Name = "TaskBoard";
             this.Text = "TaskBoard";
+            this.Activated += new System.EventHandler(this.TaskBoard_Activated);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TaskBoard_FormClosing);
             this.Load += new System.EventHandler(this.TaskBoard_Load);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TaskBoard_MouseDown);

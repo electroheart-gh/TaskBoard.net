@@ -51,6 +51,8 @@
             this.pbIcon.TabIndex = 0;
             this.pbIcon.TabStop = false;
             this.pbIcon.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseDown);
+            this.pbIcon.MouseLeave += new System.EventHandler(this.TaskUserControl_MouseLeave);
+            this.pbIcon.MouseHover += new System.EventHandler(this.TaskUserControl_MouseHover);
             this.pbIcon.MouseMove += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseMove);
             this.pbIcon.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseUp);
             // 
@@ -89,6 +91,8 @@
             this.lblTaskName.Text = "taskname";
             this.lblTaskName.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.lblTaskName.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseDown);
+            this.lblTaskName.MouseLeave += new System.EventHandler(this.TaskUserControl_MouseLeave);
+            this.lblTaskName.MouseHover += new System.EventHandler(this.TaskUserControl_MouseHover);
             this.lblTaskName.MouseMove += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseMove);
             this.lblTaskName.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseUp);
             // 
@@ -98,6 +102,7 @@
             this.toolTipTaskName.AutoPopDelay = 5000;
             this.toolTipTaskName.InitialDelay = 50;
             this.toolTipTaskName.ReshowDelay = 10;
+            this.toolTipTaskName.Popup += new System.Windows.Forms.PopupEventHandler(this.toolTipTaskName_Popup);
             // 
             // TaskUserControl
             // 
@@ -114,6 +119,8 @@
             this.Padding = new System.Windows.Forms.Padding(4);
             this.Size = new System.Drawing.Size(72, 72);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseDown);
+            this.MouseLeave += new System.EventHandler(this.TaskUserControl_MouseLeave);
+            this.MouseHover += new System.EventHandler(this.TaskUserControl_MouseHover);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseUp);
             ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).EndInit();

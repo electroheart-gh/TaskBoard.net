@@ -17,6 +17,7 @@ namespace TaskBoardWf
         // TODO: Consider to write rubber band above the task icon 
         // TODO: Make it scalable and scrollable
         // TODO: Implement keyboard interface
+        // TODO: Make HOTKEY and colors configurable
 
         //
         // Variables for Rubber Band 
@@ -87,13 +88,11 @@ namespace TaskBoardWf
         private static extern IntPtr GetWindow(IntPtr hWnd, uint uCmd);
 
         [DllImport("user32.dll")]
-        public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-
-        [DllImport("user32.dll")]
-        private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
 
         [DllImport("user32.dll")]
         private static extern bool IsWindowVisible(IntPtr hWnd);
+
 
 
         // Get window handles of the windows on the taskbar
@@ -106,8 +105,7 @@ namespace TaskBoardWf
                 {
                     // Magic spells to select windows on the taskbar 
                     if (IsWindowVisible(hWnd) & GetWindow(hWnd, GW_OWNER) == IntPtr.Zero
-                    & ((GetWindowLong(hWnd, GWL_EXSTYLE) & (WS_EX_NOREDIRECTIONBITMAP | WS_EX_TOOLWINDOW)) == 0))
-                    {
+                    & ((GetWindowLong(hWnd, GWL_EXSTYLE) & (WS_EX_NOREDIRECTIONBITMAP | WS_EX_TOOLWINDOW)) == 0)) {
                         taskListAsHwnd.Add(hWnd);
                     }
                     return true;
@@ -131,26 +129,21 @@ namespace TaskBoardWf
             // TODO: Consider to disallow overlapping controls
 
             // Next to the most bottom and most right Task control
-            foreach (Control ctrl in Controls.OfType<TaskUserControl>())
-            {
-                if (baseCtrl == null || baseCtrl.Bottom < ctrl.Bottom || (baseCtrl.Bottom == ctrl.Bottom && baseCtrl.Right < ctrl.Right))
-                {
+            foreach (Control ctrl in Controls.OfType<TaskUserControl>()) {
+                if (baseCtrl == null || baseCtrl.Bottom < ctrl.Bottom || (baseCtrl.Bottom == ctrl.Bottom && baseCtrl.Right < ctrl.Right)) {
                     baseCtrl = ctrl;
                 }
             }
 
-            if (baseCtrl == null)
-            {
+            if (baseCtrl == null) {
                 // The first one should be place at (0, 0)
                 return Point.Empty;
             }
-            else if (baseCtrl.Right + baseCtrl.Width > Width)
-            {
+            else if (baseCtrl.Right + baseCtrl.Width > Width) {
                 // If excessing Board width, place lower
                 return new Point(0, baseCtrl.Top + baseCtrl.Height);
             }
-            else
-            {
+            else {
                 // Otherwise, place next to the one
                 return new Point(baseCtrl.Right, baseCtrl.Top);
             }
@@ -162,35 +155,31 @@ namespace TaskBoardWf
             var runningTasks = GetTaskHwndList();
             var taskToRemove = new List<TaskUserControl>();
 
-            foreach (var taskControl in Controls.OfType<TaskUserControl>())
-            {
-                if (runningTasks.Contains(taskControl.WindowHandle))
-                {
+            foreach (var taskControl in Controls.OfType<TaskUserControl>()) {
+                if (runningTasks.Contains(taskControl.WindowHandle)) {
                     // Remove existing Task controls from the variable to extract new tasks
                     runningTasks.Remove(taskControl.WindowHandle);
                     taskControl.Renew();
                 }
-                else
-                {
+                else {
                     // Add obsolete tasks to the list
                     // Disposing control here makes "foreach" not work properly
                     taskToRemove.Add(taskControl);
                 }
             }
             // Dispose obsolete Task controls 
-            foreach (var task in taskToRemove)
-            {
+            foreach (var task in taskToRemove) {
                 task.Dispose();
             }
             // Add new tasks
-            foreach (var newTask in runningTasks)
-            {
+            foreach (var newTask in runningTasks) {
                 var newTaskControl = new TaskUserControl(newTask);
                 newTaskControl.Location = ProposePosition();
                 Controls.Add(newTaskControl);
                 newTaskControl.BringToFront();
             }
             // TODO: Save tasks positions to recover the layout when restarting after crashes
+            // TODO: Save tasks positions to avoid rearrange tasks every time logging in using short cut and/or MiLauncher
         }
 
 
@@ -204,13 +193,11 @@ namespace TaskBoardWf
 
         private void TaskBoard_MouseDown(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left)
-            {
+            if (e.Button == MouseButtons.Left) {
                 Renew();
                 rubberBandStart = PointToClient(Cursor.Position);
                 isSelecting = true;
-                foreach (var taskControl in Controls.OfType<TaskUserControl>())
-                {
+                foreach (var taskControl in Controls.OfType<TaskUserControl>()) {
                     taskControl.IsSelected = false;
                 }
             }
@@ -218,8 +205,7 @@ namespace TaskBoardWf
 
         private void TaskBoard_MouseMove(object sender, MouseEventArgs e)
         {
-            if (isSelecting)
-            {
+            if (isSelecting) {
                 // Draw rubber band
                 rubberBandEnd = PointToClient(Cursor.Position);
                 RubberBandBox.Bounds = RectangleExt.Create(rubberBandStart, rubberBandEnd);
@@ -244,14 +230,11 @@ namespace TaskBoardWf
                 gRubberBand.Dispose();
 
                 // Check overlapped Task controls with rubber band
-                foreach (var taskControl in Controls.OfType<TaskUserControl>())
-                {
-                    if (new Rectangle(taskControl.Location, taskControl.Size).IntersectsWith(RubberBandBox.Bounds))
-                    {
+                foreach (var taskControl in Controls.OfType<TaskUserControl>()) {
+                    if (new Rectangle(taskControl.Location, taskControl.Size).IntersectsWith(RubberBandBox.Bounds)) {
                         taskControl.IsSelected = true;
                     }
-                    else
-                    {
+                    else {
                         taskControl.IsSelected = false;
                     }
                 }
@@ -260,8 +243,7 @@ namespace TaskBoardWf
 
         private void TaskBoard_MouseUp(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left)
-            {
+            if (e.Button == MouseButtons.Left) {
                 // Erase rubber band
                 // To avoid 0 width/height, which makes an error, add +1 to Width and Height
                 RubberBandBox.Image = new Bitmap(RubberBandBox.Width + 1, RubberBandBox.Height + 1);
@@ -270,6 +252,11 @@ namespace TaskBoardWf
 
                 isSelecting = false;
             }
+        }
+
+        private void TaskBoard_Activated(object sender, EventArgs e)
+        {
+            Renew();
         }
     }
 }
