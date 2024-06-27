@@ -55,8 +55,6 @@ namespace TaskBoardWf
             // Global Hot Key
             hotKey = new HotKey(MOD_KEY.ALT, Keys.Q);  // Keys.MButton not work
             hotKey.HotKeyPush += new EventHandler(hotKey_HotKeyPush);
-
-            // TODO: Consider not to display the task board on the task bar
         }
 
         void hotKey_HotKeyPush(object sender, EventArgs e)

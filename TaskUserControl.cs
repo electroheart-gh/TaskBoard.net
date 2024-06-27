@@ -39,9 +39,9 @@ namespace TaskBoardWf
                 lblTaskName.ForeColor = ModifyNameColor(value);
 
                 // Due to performance issue, gave up to add exe name to the tooltips
-                toolTipTaskName.SetToolTip(this, taskName);
+                //toolTipTaskName.SetToolTip(this, taskName);
                 toolTipTaskName.SetToolTip(lblTaskName, taskName);
-                toolTipTaskName.SetToolTip(pbIcon, taskName);
+                //toolTipTaskName.SetToolTip(pbIcon, taskName);
             }
         }
 
@@ -105,18 +105,12 @@ namespace TaskBoardWf
         private const int GCL_HICONSM = -34;
 
         private const int WPF_RESTORETOMAXIMIZED = 0x02;
-        //private const int SW_HIDE = 0;
-        //private const int SW_SHOWNORMAL = 1;
         private const int SW_SHOWMINIMIZED = 2;
         private const int SW_SHOWMAXIMIZED = 3;
         private const int SW_RESTORE = 9;
         private const int WM_CLOSE = 0x0010;
 
         private const int PW_RENDERFULLCONTENT = 2;
-
-        //private const int GWL_STYLE = -16;
-        //private const int WS_DISABLED = 0x08000000;
-        //private const int WM_SETREDRAW = 0x000B;
 
 
         [DllImport("user32.dll")]
@@ -136,19 +130,6 @@ namespace TaskBoardWf
 
         [DllImport("user32.dll")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
-
-        //[DllImport("user32.dll")]
-        //private static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
-
-        //[DllImport("user32.dll")]
-        //[return: MarshalAs(UnmanagedType.Bool)]
-        //private static extern bool SendMessage(IntPtr hWnd, int Msg, bool wParam, int lParam);
-
-        //[DllImport("user32.dll")]
-        //private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
-
-        //[DllImport("user32.dll")]
-        //private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
 
         [DllImport("user32.dll")]
         private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
@@ -177,7 +158,6 @@ namespace TaskBoardWf
             public Point ptMaxPosition;
             public Rectangle rcNormalPosition;
         }
-
 
         //
         // Methods For Windows Icon
@@ -417,7 +397,5 @@ namespace TaskBoardWf
         }
 
         // TODO: Create menu item to save task position to place task with same task name
-        // TODO: Display window image when mouse-over, on task board!?
-
     }
 }

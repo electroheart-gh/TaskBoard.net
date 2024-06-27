@@ -91,8 +91,6 @@
             this.lblTaskName.Text = "taskname";
             this.lblTaskName.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.lblTaskName.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseDown);
-            this.lblTaskName.MouseLeave += new System.EventHandler(this.TaskUserControl_MouseLeave);
-            this.lblTaskName.MouseHover += new System.EventHandler(this.TaskUserControl_MouseHover);
             this.lblTaskName.MouseMove += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseMove);
             this.lblTaskName.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseUp);
             // 
