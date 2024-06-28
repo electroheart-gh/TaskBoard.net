@@ -297,16 +297,13 @@ namespace TaskBoardWf
             // but the control moves with mouse when dragged and this makes the distance to 0
         }
 
-        private async void closeToolStripMenuItem_Click(object sender, EventArgs e)
+        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             foreach (var taskControl in Parent.Controls.OfType<TaskUserControl>()) {
                 if (taskControl.IsSelected) {
                     CloseTask(taskControl.WindowHandle);
                 }
             }
-            // Wait for closed process to be killed
-            await Task.Delay(200);
-            ((TaskBoard)Parent).Renew();
         }
 
         private void CloseTask(IntPtr hWnd)
