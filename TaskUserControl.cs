@@ -77,7 +77,7 @@ namespace TaskBoardWf
 
         private int drags;
         private Point dragStart;
-
+        private IntPtr thumbHandle;
 
         //
         // Constructors
@@ -140,8 +140,46 @@ namespace TaskBoardWf
         [DllImport("user32.dll")]
         private static extern bool PrintWindow(IntPtr hWnd, IntPtr hdcBlt, int nFlags);
 
+
+        [DllImport("dwmapi.dll", SetLastError = true)]
+        private static extern int DwmRegisterThumbnail(IntPtr dest, IntPtr src, out IntPtr thumb);
+
+        [DllImport("dwmapi.dll", SetLastError = true)]
+        private static extern int DwmUnregisterThumbnail(IntPtr thumb);
+
+        [DllImport("dwmapi.dll", SetLastError = true)]
+        private static extern int DwmQueryThumbnailSourceSize(IntPtr thumb, out PSIZE size);
+
+        [DllImport("dwmapi.dll", SetLastError = true)]
+        private static extern int DwmUpdateThumbnailProperties(IntPtr hThumbnail, ref DWM_THUMBNAIL_PROPERTIES props);
+
+
         [StructLayout(LayoutKind.Sequential)]
-        private struct RECT
+        internal  struct PSIZE
+        {
+            public int x;
+            public int y;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct DWM_THUMBNAIL_PROPERTIES
+        {
+            public int dwFlags;
+            public RECT rcDestination;
+            public RECT rcSource;
+            public byte opacity;
+            public bool fVisible;
+            public bool fSourceClientAreaOnly;
+
+            public const int DWM_TNP_RECTDESTINATION = 0x00000001;
+            public const int DWM_TNP_RECTSOURCE = 0x00000002;
+            public const int DWM_TNP_OPACITY = 0x00000004;
+            public const int DWM_TNP_VISIBLE = 0x00000008;
+            public const int DWM_TNP_SOURCECLIENTAREAONLY = 0x00000010;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct RECT
         {
             public int Left;
             public int Top;
@@ -149,7 +187,7 @@ namespace TaskBoardWf
             public int Bottom;
         }
 
-        private struct WINDOWPLACEMENT
+        internal struct WINDOWPLACEMENT
         {
             public int length;
             public int flags;
@@ -339,22 +377,31 @@ namespace TaskBoardWf
 
         private void TaskUserControl_MouseHover(object sender, EventArgs e)
         {
-            var placement = new WINDOWPLACEMENT();
-            placement.length = Marshal.SizeOf(placement);
-            GetWindowPlacement(WindowHandle, ref placement);
-            
-            if ((placement.showCmd & SW_SHOWMINIMIZED) == SW_SHOWMINIMIZED) {
-                if ((placement.flags & WPF_RESTORETOMAXIMIZED) == WPF_RESTORETOMAXIMIZED) {
-                    ShowWindow(WindowHandle, SW_SHOWMAXIMIZED);
-                }
-                else {
-                    ShowWindow(WindowHandle, SW_RESTORE);
-                }
+            IntPtr destinationHWnd = Parent.Handle;
+
+            int result = DwmRegisterThumbnail(destinationHWnd, WindowHandle, out thumbHandle);
+            if (result != 0) {
+                Debug.WriteLine("Failed to register thumbnail.");
+                return;
             }
 
-            Bitmap screenshot = ResizeImage(CaptureWindow(WindowHandle));
-            Parent.BackgroundImage = screenshot;
-            SetForegroundWindow(Parent.Handle);
+            //DwmQueryThumbnailSourceSize(thumbHandle, out PSIZE size);
+            RECT destinationRect = new RECT {
+                Left = Parent.Left,
+                Top = Parent.Top,
+                Right = Parent.Right,
+                Bottom = Parent.Bottom
+            };
+            DWM_THUMBNAIL_PROPERTIES props = new DWM_THUMBNAIL_PROPERTIES {
+                dwFlags = DWM_THUMBNAIL_PROPERTIES.DWM_TNP_RECTDESTINATION |
+                          DWM_THUMBNAIL_PROPERTIES.DWM_TNP_VISIBLE |
+                          DWM_THUMBNAIL_PROPERTIES.DWM_TNP_OPACITY,
+                rcDestination = destinationRect,
+                fVisible = true,
+                opacity = Program.appSettings.ThumbOpacity
+            };
+
+            DwmUpdateThumbnailProperties(thumbHandle, ref props);
         }
 
         private Bitmap CaptureWindow(IntPtr hWnd)
@@ -384,13 +431,11 @@ namespace TaskBoardWf
 
         private void TaskUserControl_MouseLeave(object sender, EventArgs e)
         {
-            Parent.BackgroundImage = null;
+            DwmUnregisterThumbnail(thumbHandle);
         }
 
         private void toolTipTaskName_Popup(object sender, PopupEventArgs e)
         {
-            //Bitmap screenshot = CaptureWindow(WindowHandle);
-            //Parent.BackgroundImage = screenshot;
         }
 
         // TODO: Create menu item to save task position to place task with same task name
