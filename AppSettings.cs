@@ -13,7 +13,8 @@ namespace TaskBoardWf
     public class AppSettings
     {
         public List<NameModifier> NameModifiers { get; set; }
-        public byte ThumbOpacity {  get; set; }
+        public byte ThumbnailOpacity { get; set; }
+        public bool BackgroundThumbnail { get; set; }
 
         // Configuration class to modify display of lblTaskName
         // If Pattern match, replace it with Substitution and set the Forecolor
@@ -23,7 +24,7 @@ namespace TaskBoardWf
             public string Substitution { get; set; }
             public string ForeColor { get; set; }
 
-            public NameModifier() 
+            public NameModifier()
             {
                 Pattern = string.Empty;
                 Substitution = string.Empty;
@@ -34,7 +35,8 @@ namespace TaskBoardWf
         public AppSettings()
         {
             NameModifiers = new List<NameModifier>();
-            ThumbOpacity = 128;
+            ThumbnailOpacity = 52;
+            BackgroundThumbnail= false;
         }
     }
 }

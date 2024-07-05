@@ -20,13 +20,11 @@ namespace TaskBoardWf
 
         public T LoadSettings<T>()
         {
-            try
-            {
+            try {
                 string json = File.ReadAllText(settingsFilePath);
                 return JsonSerializer.Deserialize<T>(json);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Console.WriteLine($"Error loading settings: {ex.Message}");
                 return default;
             }

@@ -100,7 +100,6 @@
             this.toolTipTaskName.AutoPopDelay = 5000;
             this.toolTipTaskName.InitialDelay = 50;
             this.toolTipTaskName.ReshowDelay = 10;
-            this.toolTipTaskName.Popup += new System.Windows.Forms.PopupEventHandler(this.toolTipTaskName_Popup);
             // 
             // TaskUserControl
             // 

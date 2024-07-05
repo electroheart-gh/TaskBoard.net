@@ -12,7 +12,6 @@ namespace TaskBoardWf
 {
     public partial class TaskUserControl : UserControl
     {
-
         //
         // Parameters and variables
         //
@@ -77,7 +76,9 @@ namespace TaskBoardWf
 
         private int drags;
         private Point dragStart;
+
         private IntPtr thumbHandle;
+        private int deltaOpacity;
 
         //
         // Constructors
@@ -86,11 +87,9 @@ namespace TaskBoardWf
         {
             InitializeComponent();
             WindowHandle = hwnd;
-        }
 
-        public TaskUserControl()
-        {
-            InitializeComponent();
+            MouseWheel += new MouseEventHandler(TaskUserControl_MouseWheel);
+
         }
 
         //
@@ -111,7 +110,6 @@ namespace TaskBoardWf
         private const int WM_CLOSE = 0x0010;
 
         private const int PW_RENDERFULLCONTENT = 2;
-
 
         [DllImport("user32.dll")]
         private static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
@@ -140,7 +138,6 @@ namespace TaskBoardWf
         [DllImport("user32.dll")]
         private static extern bool PrintWindow(IntPtr hWnd, IntPtr hdcBlt, int nFlags);
 
-
         [DllImport("dwmapi.dll", SetLastError = true)]
         private static extern int DwmRegisterThumbnail(IntPtr dest, IntPtr src, out IntPtr thumb);
 
@@ -153,9 +150,8 @@ namespace TaskBoardWf
         [DllImport("dwmapi.dll", SetLastError = true)]
         private static extern int DwmUpdateThumbnailProperties(IntPtr hThumbnail, ref DWM_THUMBNAIL_PROPERTIES props);
 
-
         [StructLayout(LayoutKind.Sequential)]
-        internal  struct PSIZE
+        internal struct PSIZE
         {
             public int x;
             public int y;
@@ -248,7 +244,6 @@ namespace TaskBoardWf
             }
         }
 
-
         //
         // Methods for display control
         //
@@ -260,10 +255,8 @@ namespace TaskBoardWf
                 WindowHandle = windowHandle;
                 return true;
             }
-            else {
-                lblTaskName.ForeColor = Color.Red;
-                return false;
-            }
+            lblTaskName.ForeColor = Color.Red;
+            return false;
         }
 
         // Foreground window for the task
@@ -282,7 +275,6 @@ namespace TaskBoardWf
             }
             SetForegroundWindow(hWnd);
         }
-
 
         //
         // Event handlers
@@ -377,9 +369,34 @@ namespace TaskBoardWf
 
         private void TaskUserControl_MouseHover(object sender, EventArgs e)
         {
-            IntPtr destinationHWnd = Parent.Handle;
+            Focus();
 
-            int result = DwmRegisterThumbnail(destinationHWnd, WindowHandle, out thumbHandle);
+            if (Program.appSettings.BackgroundThumbnail) {
+                DisplayThumbnailOpaque();
+                //Parent.BackgroundImage = ResizeImage(CaptureWindow(Parent.Handle));
+                //Parent.BackgroundImage = ConvertToGrayscale(ResizeImage(CaptureWindow(Parent.Handle)));
+                Bitmap screenImage = CaptureWindow(Parent.Handle);
+                DwmUnregisterThumbnail(thumbHandle);
+                thumbHandle = IntPtr.Zero;
+                Parent.BackgroundImage = ConvertToGrayscale(ResizeImage(screenImage));
+            }
+            else {
+                DisplayThumbnail();
+            }
+        }
+        private void DisplayThumbnailOpaque()
+        {
+            DisplayThumbnail(opaque: true);
+        }
+
+        private void DisplayThumbnail(bool opaque = false)
+        {
+            // For safety, check and unregister thumbHandle before registering
+            if (thumbHandle != IntPtr.Zero) {
+                DwmUnregisterThumbnail(thumbHandle);
+                thumbHandle = IntPtr.Zero;
+            }
+            int result = DwmRegisterThumbnail(Parent.Handle, WindowHandle, out thumbHandle);
             if (result != 0) {
                 Debug.WriteLine("Failed to register thumbnail.");
                 return;
@@ -392,16 +409,44 @@ namespace TaskBoardWf
                 Right = Parent.Right,
                 Bottom = Parent.Bottom
             };
+
+
             DWM_THUMBNAIL_PROPERTIES props = new DWM_THUMBNAIL_PROPERTIES {
                 dwFlags = DWM_THUMBNAIL_PROPERTIES.DWM_TNP_RECTDESTINATION |
                           DWM_THUMBNAIL_PROPERTIES.DWM_TNP_VISIBLE |
                           DWM_THUMBNAIL_PROPERTIES.DWM_TNP_OPACITY,
                 rcDestination = destinationRect,
                 fVisible = true,
-                opacity = Program.appSettings.ThumbOpacity
+                opacity = opaque
+                          ? byte.MaxValue
+                          : (byte)(Program.appSettings.ThumbnailOpacity + deltaOpacity)
+                //: Math.Max(Math.Min((byte)(Program.appSettings.ThumbnailOpacity + deltaOpacity), byte.MaxValue), byte.MinValue)
             };
 
             DwmUpdateThumbnailProperties(thumbHandle, ref props);
+        }
+
+        private void TaskUserControl_MouseWheel(object sender, MouseEventArgs e)
+        {
+            Debug.WriteLine("mouse wheel event " + (e.Delta > 0 ? "Up" : "Down"));
+            // CMICst
+            deltaOpacity += (e.Delta > 0) ? 20 : -20;
+            deltaOpacity = Math.Min(deltaOpacity, byte.MaxValue - Program.appSettings.ThumbnailOpacity);
+            deltaOpacity = Math.Max(deltaOpacity, byte.MinValue - Program.appSettings.ThumbnailOpacity);
+
+            DisplayThumbnail();
+        }
+
+        private void TaskUserControl_MouseLeave(object sender, EventArgs e)
+        {
+            if (Program.appSettings.BackgroundThumbnail) {
+                Parent.BackgroundImage = null;
+            }
+            else {
+                DwmUnregisterThumbnail(thumbHandle);
+                thumbHandle = IntPtr.Zero;
+                deltaOpacity = 0;
+            }
         }
 
         private Bitmap CaptureWindow(IntPtr hWnd)
@@ -416,10 +461,31 @@ namespace TaskBoardWf
             return bitmap;
         }
 
+        private Bitmap ConvertToGrayscale(Bitmap original)
+        {
+            Bitmap grayscaleBitmap = new Bitmap(original.Width, original.Height);
+
+            for (int y = 0; y < original.Height; y++) {
+                for (int x = 0; x < original.Width; x++) {
+                    Color originalColor = original.GetPixel(x, y);
+
+                    // グレースケールの計算（標準的な輝度法）
+                    int grayScale = (int)(originalColor.R * 0.3 + originalColor.G * 0.59 + originalColor.B * 0.11);
+
+                    // 新しい色を設定
+                    Color grayColor = Color.FromArgb(originalColor.A, grayScale, grayScale, grayScale);
+                    grayscaleBitmap.SetPixel(x, y, grayColor);
+                }
+            }
+            return grayscaleBitmap;
+        }
+
         private Bitmap ResizeImage(Bitmap image)
         {
             int newWidth = (int)(image.Width * 0.9);
+            //int newWidth = (int)(image.Width * 0.5);
             int newHeight = (int)(image.Height * 0.9);
+            //int newHeight = (int)(image.Height * 0.5);
 
             Bitmap resizedImage = new Bitmap(newWidth, newHeight);
             using (Graphics g = Graphics.FromImage(resizedImage)) {
@@ -428,16 +494,6 @@ namespace TaskBoardWf
             }
             return resizedImage;
         }
-
-        private void TaskUserControl_MouseLeave(object sender, EventArgs e)
-        {
-            DwmUnregisterThumbnail(thumbHandle);
-        }
-
-        private void toolTipTaskName_Popup(object sender, PopupEventArgs e)
-        {
-        }
-
         // TODO: Create menu item to save task position to place task with same task name
     }
 }
