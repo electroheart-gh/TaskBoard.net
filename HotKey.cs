@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace TaskBoardWf
@@ -35,8 +31,7 @@ namespace TaskBoardWf
 
         private void raiseHotKeyPush()
         {
-            if (HotKeyPush != null)
-            {
+            if (HotKeyPush != null) {
                 HotKeyPush(this, EventArgs.Empty);
             }
         }
@@ -61,10 +56,8 @@ namespace TaskBoardWf
             public HotKeyForm(MOD_KEY modKey, Keys key, ThreadStart proc)
             {
                 this.proc = proc;
-                for (int i = 0x0000; i <= 0xbfff; i++)
-                {
-                    if (RegisterHotKey(this.Handle, i, modKey, key) != 0)
-                    {
+                for (int i = 0x0000; i <= 0xbfff; i++) {
+                    if (RegisterHotKey(this.Handle, i, modKey, key) != 0) {
                         id = i;
                         break;
                     }
@@ -75,10 +68,8 @@ namespace TaskBoardWf
             {
                 base.WndProc(ref m);
 
-                if (m.Msg == WM_HOTKEY)
-                {
-                    if ((int)m.WParam == id)
-                    {
+                if (m.Msg == WM_HOTKEY) {
+                    if ((int)m.WParam == id) {
                         proc();
                     }
                 }
