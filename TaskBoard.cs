@@ -133,7 +133,7 @@ namespace TaskBoardWf
                 // The first one should be place at (0, 0)
                 return Point.Empty;
             }
-            else if (baseCtrl.Right + baseCtrl.Width > Width) {
+            else if (baseCtrl.Right + baseCtrl.Width > Screen.PrimaryScreen.WorkingArea.Width) {
                 // If excessing Board width, place lower
                 return new Point(0, baseCtrl.Top + baseCtrl.Height);
             }
