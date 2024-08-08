@@ -8,7 +8,9 @@ namespace TaskBoardWf
     {
         public List<NameModifier> NameModifiers { get; set; }
         public byte ThumbnailOpacity { get; set; }
+        public byte DeltaOpacity { get; set; }
         public bool BackgroundThumbnail { get; set; }
+
 
         // Configuration class to modify display of lblTaskName
         // If Pattern match, replace it with Substitution and set the Forecolor
@@ -30,6 +32,7 @@ namespace TaskBoardWf
         {
             NameModifiers = new List<NameModifier>();
             ThumbnailOpacity = 52;
+            DeltaOpacity = 40;
             BackgroundThumbnail = false;
         }
     }

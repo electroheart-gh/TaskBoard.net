@@ -383,6 +383,7 @@ namespace TaskBoardWf
                 DisplayThumbnail();
             }
         }
+
         private void DisplayThumbnailOpaque()
         {
             DisplayThumbnail(opaque: true);
@@ -409,7 +410,6 @@ namespace TaskBoardWf
                 Bottom = Parent.Bottom
             };
 
-
             DWM_THUMBNAIL_PROPERTIES props = new DWM_THUMBNAIL_PROPERTIES {
                 dwFlags = DWM_THUMBNAIL_PROPERTIES.DWM_TNP_RECTDESTINATION |
                           DWM_THUMBNAIL_PROPERTIES.DWM_TNP_VISIBLE |
@@ -428,8 +428,8 @@ namespace TaskBoardWf
         private void TaskUserControl_MouseWheel(object sender, MouseEventArgs e)
         {
             Debug.WriteLine("mouse wheel event " + (e.Delta > 0 ? "Up" : "Down"));
-            // CMICst
-            deltaOpacity += (e.Delta > 0) ? 20 : -20;
+            var delta = Program.appSettings.DeltaOpacity;
+            deltaOpacity += (e.Delta > 0) ? delta : -delta;
             deltaOpacity = Math.Min(deltaOpacity, byte.MaxValue - Program.appSettings.ThumbnailOpacity);
             deltaOpacity = Math.Max(deltaOpacity, byte.MinValue - Program.appSettings.ThumbnailOpacity);
 
