@@ -110,7 +110,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppSettings.cs" />
+    <Compile Include="CustomTraceListener.cs" />
     <Compile Include="HotKey.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="RectangleExt.cs" />
     <Compile Include="SettingManager.cs" />
     <Compile Include="TaskUserControl.cs">

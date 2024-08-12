@@ -217,7 +217,9 @@ namespace TaskBoardWf
             try {
                 return Icon.ExtractAssociatedIcon(GetExePath(hWnd));
             }
-            catch (ArgumentException) { }
+            catch (ArgumentException e) {
+                Logger.LogWarning(e.Message);
+            }
 
             return null;
         }

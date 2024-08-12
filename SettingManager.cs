@@ -21,7 +21,7 @@ namespace TaskBoardWf
                 return JsonSerializer.Deserialize<T>(json);
             }
             catch (Exception ex) {
-                Console.WriteLine($"Error loading settings: {ex.Message}");
+                Logger.LogError($"Loading settings: {ex.Message}");
                 return default;
             }
         }

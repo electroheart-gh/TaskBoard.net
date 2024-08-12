@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 
 namespace TaskBoardWf
@@ -72,6 +73,7 @@ namespace TaskBoardWf
         private const int GWL_EXSTYLE = -20;
         private const long WS_EX_NOREDIRECTIONBITMAP = 0x00200000L;
         private const long WS_EX_TOOLWINDOW = 0x00000080L;
+        private const long WS_EX_APPWINDOW = 0x00040000L;
 
         private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
 
@@ -87,7 +89,10 @@ namespace TaskBoardWf
         [DllImport("user32.dll")]
         private static extern bool IsWindowVisible(IntPtr hWnd);
 
-
+        [DllImport("user32.dll")]
+        private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+        [DllImport("user32.dll")]
+        private static extern bool IsIconic(IntPtr hWnd);
 
         // Get window handles of the windows on the taskbar
         public static List<IntPtr> GetTaskHwndList()
@@ -97,9 +102,32 @@ namespace TaskBoardWf
             EnumWindows(
                 (hWnd, lParam) =>
                 {
+                    if (Program.appSettings.ExperimentalTaskList) {
+                        var windowText = new StringBuilder(256);
+                        GetWindowText(hWnd, windowText, windowText.Capacity);
+                        Logger.LogInfo($"GetWindowText:  {windowText}");
+
+                        Logger.LogInfo($"Visible: {IsWindowVisible(hWnd)}");
+                        Logger.LogInfo($"Owner: {GetWindow(hWnd, GW_OWNER)}");
+                        Logger.LogInfo($"REDIRECT: {GetWindowLong(hWnd, GWL_EXSTYLE) & (WS_EX_NOREDIRECTIONBITMAP)}");
+                        Logger.LogInfo($"TOOL: {GetWindowLong(hWnd, GWL_EXSTYLE) & (WS_EX_TOOLWINDOW)}");
+                        Logger.LogInfo($"APPWINDOW: {GetWindowLong(hWnd, GWL_EXSTYLE) & (WS_EX_APPWINDOW)}");
+                        Logger.LogInfo($"Owner Min: {IsIconic(GetWindow(hWnd, GW_OWNER))}");
+
+                        if (!IsWindowVisible(hWnd)) return true;
+                        var exStyle = GetWindowLong(hWnd, GWL_EXSTYLE);
+                        if ((exStyle & WS_EX_NOREDIRECTIONBITMAP) != 0) return true;
+                        if ((exStyle & WS_EX_TOOLWINDOW) != 0) return true;
+                        var ownerHWnd = GetWindow(hWnd, GW_OWNER);
+                        if ((ownerHWnd != IntPtr.Zero) && ((exStyle & WS_EX_APPWINDOW) == 0 || IsIconic(ownerHWnd))) return true;
+
+                        // Join the club!
+                        taskListAsHwnd.Add(hWnd);
+                    }
                     // Magic spells to select windows on the taskbar 
-                    if (IsWindowVisible(hWnd) & GetWindow(hWnd, GW_OWNER) == IntPtr.Zero
-                    & ((GetWindowLong(hWnd, GWL_EXSTYLE) & (WS_EX_NOREDIRECTIONBITMAP | WS_EX_TOOLWINDOW)) == 0)) {
+                    else if (IsWindowVisible(hWnd) &&
+                        GetWindow(hWnd, GW_OWNER) == IntPtr.Zero &&
+                        (GetWindowLong(hWnd, GWL_EXSTYLE) & (WS_EX_NOREDIRECTIONBITMAP | WS_EX_TOOLWINDOW)) == 0) {
                         taskListAsHwnd.Add(hWnd);
                     }
                     return true;
