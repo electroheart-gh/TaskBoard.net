@@ -8,6 +8,9 @@ namespace TaskBoardWf
         // Global variable for configuration
         static public AppSettings appSettings = new AppSettings();
 
+        // Constant for configuration
+        private const string configFilePath = "mySettings.json";
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -15,8 +18,12 @@ namespace TaskBoardWf
         static void Main()
         {
             // Read configuration
-            var settingsManager = new SettingsManager();
-            appSettings = settingsManager.LoadSettings<AppSettings>();
+            appSettings = SettingManager.LoadSettings<AppSettings>(configFilePath);
+            if (appSettings is null) {
+                appSettings = new AppSettings();
+            }
+            // Save configuration
+            SettingManager.SaveSettingsNoEscape(appSettings, configFilePath);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
