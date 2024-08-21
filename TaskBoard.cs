@@ -216,9 +216,9 @@ namespace TaskBoardWf
         private void TaskBoard_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left) {
-                Renew();
                 rubberBandStart = PointToClient(Cursor.Position);
                 isSelecting = true;
+                Renew();
                 foreach (var taskControl in Controls.OfType<TaskUserControl>()) {
                     taskControl.IsSelected = false;
                 }

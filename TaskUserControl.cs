@@ -373,7 +373,8 @@ namespace TaskBoardWf
             Focus();
 
             if (Program.appSettings.BackgroundThumbnail) {
-                DisplayThumbnailOpaque();
+                // ISSUES: Flicker before capturing window
+                DisplayThumbnail(opaque: true);
                 //Parent.BackgroundImage = ResizeImage(CaptureWindow(Parent.Handle));
                 //Parent.BackgroundImage = ConvertToGrayscale(ResizeImage(CaptureWindow(Parent.Handle)));
                 Bitmap screenImage = CaptureWindow(Parent.Handle);
@@ -384,11 +385,6 @@ namespace TaskBoardWf
             else {
                 DisplayThumbnail();
             }
-        }
-
-        private void DisplayThumbnailOpaque()
-        {
-            DisplayThumbnail(opaque: true);
         }
 
         private void DisplayThumbnail(bool opaque = false)
