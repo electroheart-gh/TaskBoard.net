@@ -141,35 +141,35 @@ namespace TaskBoardWf
         {
             var taskListAsHwnd = new List<IntPtr>();
 
-            WinAPI.EnumWindows(
+            EnumWindows(
                 (hWnd, lParam) =>
                 {
                     if (Program.appSettings.ExperimentalTaskList) {
                         var windowText = new StringBuilder(256);
-                        WinAPI.GetWindowText(hWnd, windowText, windowText.Capacity);
+                        GetWindowText(hWnd, windowText, windowText.Capacity);
                         Logger.LogInfo($"GetWindowText:  {windowText}");
 
-                        Logger.LogInfo($"Visible: {WinAPI.IsWindowVisible(hWnd)}");
-                        Logger.LogInfo($"Owner: {WinAPI.GetWindow(hWnd, WinAPI.GW_OWNER)}");
-                        Logger.LogInfo($"REDIRECT: {WinAPI.GetWindowLong(hWnd, WinAPI.GWL_EXSTYLE) & (WinAPI.WS_EX_NOREDIRECTIONBITMAP)}");
-                        Logger.LogInfo($"TOOL: {WinAPI.GetWindowLong(hWnd, WinAPI.GWL_EXSTYLE) & (WinAPI.WS_EX_TOOLWINDOW)}");
-                        Logger.LogInfo($"APPWINDOW: {WinAPI.GetWindowLong(hWnd, WinAPI.GWL_EXSTYLE) & (WinAPI.WS_EX_APPWINDOW)}");
-                        Logger.LogInfo($"Owner Min: {WinAPI.IsIconic(WinAPI.GetWindow(hWnd, WinAPI.GW_OWNER))}");
+                        Logger.LogInfo($"Visible: {IsWindowVisible(hWnd)}");
+                        Logger.LogInfo($"Owner: {GetWindow(hWnd, GW_OWNER)}");
+                        Logger.LogInfo($"REDIRECT: {GetWindowLong(hWnd, GWL_EXSTYLE) & (WS_EX_NOREDIRECTIONBITMAP)}");
+                        Logger.LogInfo($"TOOL: {GetWindowLong(hWnd, GWL_EXSTYLE) & (WS_EX_TOOLWINDOW)}");
+                        Logger.LogInfo($"APPWINDOW: {GetWindowLong(hWnd, GWL_EXSTYLE) & (WS_EX_APPWINDOW)}");
+                        Logger.LogInfo($"Owner Min: {IsIconic(GetWindow(hWnd, GW_OWNER))}");
 
-                        if (!WinAPI.IsWindowVisible(hWnd)) return true;
-                        var exStyle = WinAPI.GetWindowLong(hWnd, WinAPI.GWL_EXSTYLE);
-                        if ((exStyle & WinAPI.WS_EX_NOREDIRECTIONBITMAP) != 0) return true;
-                        if ((exStyle & WinAPI.WS_EX_TOOLWINDOW) != 0) return true;
-                        var ownerHWnd = WinAPI.GetWindow(hWnd, WinAPI.GW_OWNER);
-                        if ((ownerHWnd != IntPtr.Zero) && ((exStyle & WinAPI.WS_EX_APPWINDOW) == 0 || WinAPI.IsIconic(ownerHWnd))) return true;
+                        if (!IsWindowVisible(hWnd)) return true;
+                        var exStyle = GetWindowLong(hWnd, GWL_EXSTYLE);
+                        if ((exStyle & WS_EX_NOREDIRECTIONBITMAP) != 0) return true;
+                        if ((exStyle & WS_EX_TOOLWINDOW) != 0) return true;
+                        var ownerHWnd = GetWindow(hWnd, GW_OWNER);
+                        if ((ownerHWnd != IntPtr.Zero) && ((exStyle & WS_EX_APPWINDOW) == 0 || IsIconic(ownerHWnd))) return true;
 
                         // Join the club!
                         taskListAsHwnd.Add(hWnd);
                     }
                     // Magic spells to select windows on the taskbar 
-                    else if (WinAPI.IsWindowVisible(hWnd) &&
-                        WinAPI.GetWindow(hWnd, WinAPI.GW_OWNER) == IntPtr.Zero &&
-                        (WinAPI.GetWindowLong(hWnd, WinAPI.GWL_EXSTYLE) & (WinAPI.WS_EX_NOREDIRECTIONBITMAP | WinAPI.WS_EX_TOOLWINDOW)) == 0) {
+                    else if (IsWindowVisible(hWnd) &&
+                        GetWindow(hWnd, GW_OWNER) == IntPtr.Zero &&
+                        (GetWindowLong(hWnd, GWL_EXSTYLE) & (WS_EX_NOREDIRECTIONBITMAP | WS_EX_TOOLWINDOW)) == 0) {
                         taskListAsHwnd.Add(hWnd);
                     }
                     return true;
@@ -181,18 +181,18 @@ namespace TaskBoardWf
 
         internal static Icon GetTaskIcon(IntPtr hWnd)
         {
-            IntPtr hIcon = WinAPI.SendMessage(hWnd, WinAPI.WM_GETICON, (IntPtr)WinAPI.ICON_BIG, IntPtr.Zero);
+            IntPtr hIcon = SendMessage(hWnd, WM_GETICON, (IntPtr)ICON_BIG, IntPtr.Zero);
             if (hIcon == IntPtr.Zero) {
-                hIcon = WinAPI.SendMessage(hWnd, WinAPI.WM_GETICON, (IntPtr)WinAPI.ICON_SMALL, IntPtr.Zero);
+                hIcon = SendMessage(hWnd, WM_GETICON, (IntPtr)ICON_SMALL, IntPtr.Zero);
             }
             if (hIcon == IntPtr.Zero) {
-                hIcon = WinAPI.SendMessage(hWnd, WinAPI.WM_GETICON, (IntPtr)WinAPI.ICON_SMALL, IntPtr.Zero);
+                hIcon = SendMessage(hWnd, WM_GETICON, (IntPtr)ICON_SMALL, IntPtr.Zero);
             }
             if (hIcon == IntPtr.Zero) {
-                hIcon = WinAPI.GetClassLong(hWnd, WinAPI.GCL_HICON);
+                hIcon = GetClassLong(hWnd, GCL_HICON);
             }
             if (hIcon == IntPtr.Zero) {
-                hIcon = WinAPI.GetClassLong(hWnd, WinAPI.GCL_HICONSM);
+                hIcon = GetClassLong(hWnd, GCL_HICONSM);
             }
             if (hIcon != IntPtr.Zero) {
                 return Icon.FromHandle(hIcon);
@@ -213,7 +213,7 @@ namespace TaskBoardWf
             if (hWnd == IntPtr.Zero) { return null; }
 
             try {
-                WinAPI.GetWindowThreadProcessId(hWnd, out uint processId);
+                GetWindowThreadProcessId(hWnd, out uint processId);
                 Process process = Process.GetProcessById((int)processId);
                 return process?.MainModule?.FileName;
             }
@@ -231,18 +231,18 @@ namespace TaskBoardWf
 
         internal static void SetForegroundTask(IntPtr hWnd)
         {
-            var placement = new WinAPI.WINDOWPLACEMENT();
+            var placement = new WINDOWPLACEMENT();
             placement.length = Marshal.SizeOf(placement);
-            WinAPI.GetWindowPlacement(hWnd, ref placement);
-            if ((placement.showCmd & WinAPI.SW_SHOWMINIMIZED) == WinAPI.SW_SHOWMINIMIZED) {
-                if ((placement.flags & WinAPI.WPF_RESTORETOMAXIMIZED) == WinAPI.WPF_RESTORETOMAXIMIZED) {
-                    WinAPI.ShowWindow(hWnd, WinAPI.SW_SHOWMAXIMIZED);
+            GetWindowPlacement(hWnd, ref placement);
+            if ((placement.showCmd & SW_SHOWMINIMIZED) == SW_SHOWMINIMIZED) {
+                if ((placement.flags & WPF_RESTORETOMAXIMIZED) == WPF_RESTORETOMAXIMIZED) {
+                    ShowWindow(hWnd, SW_SHOWMAXIMIZED);
                 }
                 else {
-                    WinAPI.ShowWindow(hWnd, WinAPI.SW_RESTORE);
+                    ShowWindow(hWnd, SW_RESTORE);
                 }
             }
-            WinAPI.SetForegroundWindow(hWnd);
+            SetForegroundWindow(hWnd);
         }
 
         internal static void CloseTask(IntPtr hWnd)
@@ -256,17 +256,17 @@ namespace TaskBoardWf
             }
             // Normal operation to close Task window
             else {
-                WinAPI.SendMessage(hWnd, WinAPI.WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
+                SendMessage(hWnd, WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
             }
         }
 
         internal static Bitmap CaptureWindow(IntPtr hWnd)
         {
-            WinAPI.GetWindowRect(hWnd, out WinAPI.RECT rect);
+            GetWindowRect(hWnd, out RECT rect);
             Bitmap bitmap = new Bitmap(rect.Right - rect.Left, rect.Bottom - rect.Top);
             using (Graphics g = Graphics.FromImage(bitmap)) {
                 IntPtr hdc = g.GetHdc();
-                WinAPI.PrintWindow(hWnd, hdc, WinAPI.PW_RENDERFULLCONTENT);
+                PrintWindow(hWnd, hdc, PW_RENDERFULLCONTENT);
                 g.ReleaseHdc(hdc);
             }
             return bitmap;
