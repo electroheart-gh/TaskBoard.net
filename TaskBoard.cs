@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -29,6 +30,9 @@ namespace TaskBoardWf
         Pen linePen;
 
         HotKey hotKey;
+
+        private IntPtr thumbHandle;
+        private int deltaOpacity;
 
 
         //
@@ -130,6 +134,115 @@ namespace TaskBoardWf
         }
 
 
+        internal void DisplayWindowImage(IntPtr winHandle)
+        {
+            if (Program.appSettings.BackgroundThumbnail) {
+                // ISSUES: Flicker before capturing window
+                DisplayThumbnail(winHandle, opaque: true);
+                //Parent.BackgroundImage = ResizeImage(CaptureWindow(Parent.Handle));
+                //Parent.BackgroundImage = ConvertToGrayscale(ResizeImage(CaptureWindow(Parent.Handle)));
+                Bitmap screenImage = WinAPI.CaptureWindow(Handle);
+                WinAPI.DwmUnregisterThumbnail(thumbHandle);
+                thumbHandle = IntPtr.Zero;
+                BackgroundImage = ConvertToGrayscale(ResizeImage(screenImage));
+            }
+            else {
+                DisplayThumbnail(winHandle);
+            }
+        }
+
+        private static Bitmap ConvertToGrayscale(Bitmap original)
+        {
+            Bitmap grayscaleBitmap = new Bitmap(original.Width, original.Height);
+
+            for (int y = 0; y < original.Height; y++) {
+                for (int x = 0; x < original.Width; x++) {
+                    Color originalColor = original.GetPixel(x, y);
+
+                    // グレースケールの計算（標準的な輝度法）
+                    int grayScale = (int)(originalColor.R * 0.3 + originalColor.G * 0.59 + originalColor.B * 0.11);
+
+                    // 新しい色を設定
+                    Color grayColor = Color.FromArgb(originalColor.A, grayScale, grayScale, grayScale);
+                    grayscaleBitmap.SetPixel(x, y, grayColor);
+                }
+            }
+            return grayscaleBitmap;
+        }
+
+        private static Bitmap ResizeImage(Bitmap image)
+        {
+            int newWidth = (int)(image.Width * 0.9);
+            //int newWidth = (int)(image.Width * 0.5);
+            int newHeight = (int)(image.Height * 0.9);
+            //int newHeight = (int)(image.Height * 0.5);
+
+            Bitmap resizedImage = new Bitmap(newWidth, newHeight);
+            using (Graphics g = Graphics.FromImage(resizedImage)) {
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.DrawImage(image, 0, 0, newWidth, newHeight);
+            }
+            return resizedImage;
+        }
+
+
+        internal void DisplayThumbnail(IntPtr winHandle, bool opaque = false)
+        {
+            // For safety, check and unregister thumbHandle before registering
+            if (thumbHandle != IntPtr.Zero) {
+                WinAPI.DwmUnregisterThumbnail(thumbHandle);
+                thumbHandle = IntPtr.Zero;
+            }
+            int result = WinAPI.DwmRegisterThumbnail(Handle, winHandle, out thumbHandle);
+            if (result != 0) {
+                Debug.WriteLine("Failed to register thumbnail.");
+                return;
+            }
+
+            WinAPI.DWM_THUMBNAIL_PROPERTIES props = new WinAPI.DWM_THUMBNAIL_PROPERTIES {
+                dwFlags = WinAPI.DWM_THUMBNAIL_PROPERTIES.DWM_TNP_RECTDESTINATION |
+                          WinAPI.DWM_THUMBNAIL_PROPERTIES.DWM_TNP_VISIBLE |
+                          WinAPI.DWM_THUMBNAIL_PROPERTIES.DWM_TNP_OPACITY,
+                // Set TaskBoard itself as destination screen
+                rcDestination = new WinAPI.RECT {
+                    Left = ClientRectangle.Left,
+                    Top = ClientRectangle.Top,
+                    Right = ClientRectangle.Right,
+                    Bottom = ClientRectangle.Bottom
+                },
+                fVisible = true,
+                opacity = opaque
+                          ? byte.MaxValue
+                          : (byte)(Program.appSettings.ThumbnailOpacity + deltaOpacity)
+                //: Math.Max(Math.Min((byte)(Program.appSettings.ThumbnailOpacity + deltaOpacity), byte.MaxValue), byte.MinValue)
+            };
+
+            WinAPI.DwmUpdateThumbnailProperties(thumbHandle, ref props);
+        }
+
+        internal void ChangeThumbnailOpacity(IntPtr winHandle, bool increase)
+        {
+            // Debug.WriteLine("mouse wheel event " + (e.Delta > 0 ? "Up" : "Down"));
+            var delta = Program.appSettings.DeltaOpacity;
+            deltaOpacity += increase ? delta : -delta;
+            deltaOpacity = Math.Min(deltaOpacity, byte.MaxValue - Program.appSettings.ThumbnailOpacity);
+            deltaOpacity = Math.Max(deltaOpacity, byte.MinValue - Program.appSettings.ThumbnailOpacity);
+
+            DisplayThumbnail(winHandle);
+        }
+
+        internal void ClearWindowImage()
+        {
+            if (Program.appSettings.BackgroundThumbnail) {
+                BackgroundImage = null;
+            }
+            else {
+                WinAPI.DwmUnregisterThumbnail(thumbHandle);
+                thumbHandle = IntPtr.Zero;
+                deltaOpacity = 0;
+            }
+        }
+
         //
         // Methods for rubber band
         //
@@ -148,6 +261,9 @@ namespace TaskBoardWf
                     taskControl.IsSelected = false;
                 }
             }
+
+            ClearWindowImage();
+
         }
 
         private void TaskBoard_MouseMove(object sender, MouseEventArgs e)

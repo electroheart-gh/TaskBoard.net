@@ -75,11 +75,8 @@ namespace TaskBoardWf
         private int drags;
         private Point dragStart;
 
-        private IntPtr thumbHandle;
-        private int deltaOpacity;
-
         //
-        // Constructors
+        // Constructor
         //
         public TaskUserControl(IntPtr hwnd)
         {
@@ -96,7 +93,7 @@ namespace TaskBoardWf
         private const int DRAG_MOVE_ALLOWANCE = 5;
 
         //
-        // Methods for display control
+        // Methods
         //
 
         // Update task name and icon of Task control by setting windowHandle to windowHandle
@@ -116,7 +113,7 @@ namespace TaskBoardWf
         private void TaskUserControl_MouseDown(object sender, MouseEventArgs e)
         {
             BringToFront();
-            Parent.BackgroundImage = null;
+            ((TaskBoard)this.FindForm()).ClearWindowImage();
 
             // If clicking unselected Task, select it and unselect others
             if (!IsSelected) {
@@ -190,114 +187,19 @@ namespace TaskBoardWf
         private void TaskUserControl_MouseHover(object sender, EventArgs e)
         {
             Focus();
-
-            if (Program.appSettings.BackgroundThumbnail) {
-                // ISSUES: Flicker before capturing window
-                DisplayThumbnail(opaque: true);
-                //Parent.BackgroundImage = ResizeImage(CaptureWindow(Parent.Handle));
-                //Parent.BackgroundImage = ConvertToGrayscale(ResizeImage(CaptureWindow(Parent.Handle)));
-                Bitmap screenImage = WinAPI.CaptureWindow(Parent.Handle);
-                WinAPI.DwmUnregisterThumbnail(thumbHandle);
-                thumbHandle = IntPtr.Zero;
-                Parent.BackgroundImage = ConvertToGrayscale(ResizeImage(screenImage));
-            }
-            else {
-                DisplayThumbnail();
-            }
-        }
-
-        private void DisplayThumbnail(bool opaque = false)
-        {
-            // For safety, check and unregister thumbHandle before registering
-            if (thumbHandle != IntPtr.Zero) {
-                WinAPI.DwmUnregisterThumbnail(thumbHandle);
-                thumbHandle = IntPtr.Zero;
-            }
-            int result = WinAPI.DwmRegisterThumbnail(Parent.Handle, WindowHandle, out thumbHandle);
-            if (result != 0) {
-                Debug.WriteLine("Failed to register thumbnail.");
-                return;
-            }
-
-            //DwmQueryThumbnailSourceSize(thumbHandle, out PSIZE size);
-            WinAPI.RECT destinationRect = new WinAPI.RECT {
-                Left = Parent.Left,
-                Top = Parent.Top,
-                Right = Parent.Right,
-                Bottom = Parent.Bottom
-            };
-
-            WinAPI.DWM_THUMBNAIL_PROPERTIES props = new WinAPI.DWM_THUMBNAIL_PROPERTIES {
-                dwFlags = WinAPI.DWM_THUMBNAIL_PROPERTIES.DWM_TNP_RECTDESTINATION |
-                          WinAPI.DWM_THUMBNAIL_PROPERTIES.DWM_TNP_VISIBLE |
-                          WinAPI.DWM_THUMBNAIL_PROPERTIES.DWM_TNP_OPACITY,
-                rcDestination = destinationRect,
-                fVisible = true,
-                opacity = opaque
-                          ? byte.MaxValue
-                          : (byte)(Program.appSettings.ThumbnailOpacity + deltaOpacity)
-                //: Math.Max(Math.Min((byte)(Program.appSettings.ThumbnailOpacity + deltaOpacity), byte.MaxValue), byte.MinValue)
-            };
-
-            WinAPI.DwmUpdateThumbnailProperties(thumbHandle, ref props);
+            ((TaskBoard)this.FindForm()).DisplayWindowImage(windowHandle);
         }
 
         private void TaskUserControl_MouseWheel(object sender, MouseEventArgs e)
         {
-            Debug.WriteLine("mouse wheel event " + (e.Delta > 0 ? "Up" : "Down"));
-            var delta = Program.appSettings.DeltaOpacity;
-            deltaOpacity += (e.Delta > 0) ? delta : -delta;
-            deltaOpacity = Math.Min(deltaOpacity, byte.MaxValue - Program.appSettings.ThumbnailOpacity);
-            deltaOpacity = Math.Max(deltaOpacity, byte.MinValue - Program.appSettings.ThumbnailOpacity);
-
-            DisplayThumbnail();
+            ((TaskBoard)this.FindForm()).ChangeThumbnailOpacity(windowHandle, e.Delta > 0);
         }
 
         private void TaskUserControl_MouseLeave(object sender, EventArgs e)
         {
-            if (Program.appSettings.BackgroundThumbnail) {
-                Parent.BackgroundImage = null;
-            }
-            else {
-                WinAPI.DwmUnregisterThumbnail(thumbHandle);
-                thumbHandle = IntPtr.Zero;
-                deltaOpacity = 0;
-            }
+            ((TaskBoard)this.FindForm()).ClearWindowImage();
         }
 
-        private static Bitmap ConvertToGrayscale(Bitmap original)
-        {
-            Bitmap grayscaleBitmap = new Bitmap(original.Width, original.Height);
-
-            for (int y = 0; y < original.Height; y++) {
-                for (int x = 0; x < original.Width; x++) {
-                    Color originalColor = original.GetPixel(x, y);
-
-                    // グレースケールの計算（標準的な輝度法）
-                    int grayScale = (int)(originalColor.R * 0.3 + originalColor.G * 0.59 + originalColor.B * 0.11);
-
-                    // 新しい色を設定
-                    Color grayColor = Color.FromArgb(originalColor.A, grayScale, grayScale, grayScale);
-                    grayscaleBitmap.SetPixel(x, y, grayColor);
-                }
-            }
-            return grayscaleBitmap;
-        }
-
-        private static Bitmap ResizeImage(Bitmap image)
-        {
-            int newWidth = (int)(image.Width * 0.9);
-            //int newWidth = (int)(image.Width * 0.5);
-            int newHeight = (int)(image.Height * 0.9);
-            //int newHeight = (int)(image.Height * 0.5);
-
-            Bitmap resizedImage = new Bitmap(newWidth, newHeight);
-            using (Graphics g = Graphics.FromImage(resizedImage)) {
-                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                g.DrawImage(image, 0, 0, newWidth, newHeight);
-            }
-            return resizedImage;
-        }
         // TODO: Create menu item to save task position to place task with same task name
     }
 }
