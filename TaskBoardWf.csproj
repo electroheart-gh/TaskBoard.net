@@ -129,6 +129,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WinAPI.cs" />
     <EmbeddedResource Include="TaskBoard.resx">
       <DependentUpon>TaskBoard.cs</DependentUpon>
     </EmbeddedResource>

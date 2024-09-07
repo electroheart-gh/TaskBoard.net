@@ -66,76 +66,48 @@ namespace TaskBoardWf
         }
 
 
-        //
-        // Constants, declaration, and methods to get Windows' Task information
-        //
-        private const uint GW_OWNER = 4;
-        private const int GWL_EXSTYLE = -20;
-        private const long WS_EX_NOREDIRECTIONBITMAP = 0x00200000L;
-        private const long WS_EX_TOOLWINDOW = 0x00000080L;
-        private const long WS_EX_APPWINDOW = 0x00040000L;
-
-        private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
-
-        [DllImport("user32.dll")]
-        private static extern bool EnumWindows(EnumWindowsProc enumProc, IntPtr lParam);
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetWindow(IntPtr hWnd, uint uCmd);
-
-        [DllImport("user32.dll")]
-        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-
-        [DllImport("user32.dll")]
-        private static extern bool IsWindowVisible(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
-        [DllImport("user32.dll")]
-        private static extern bool IsIconic(IntPtr hWnd);
-
         // Get window handles of the windows on the taskbar
-        public static List<IntPtr> GetTaskHwndList()
-        {
-            var taskListAsHwnd = new List<IntPtr>();
+        //public static List<IntPtr> GetTaskHwndList()
+        //{
+        //    var taskListAsHwnd = new List<IntPtr>();
 
-            EnumWindows(
-                (hWnd, lParam) =>
-                {
-                    if (Program.appSettings.ExperimentalTaskList) {
-                        var windowText = new StringBuilder(256);
-                        GetWindowText(hWnd, windowText, windowText.Capacity);
-                        Logger.LogInfo($"GetWindowText:  {windowText}");
+        //    WinAPI.EnumWindows(
+        //        (hWnd, lParam) =>
+        //        {
+        //            if (Program.appSettings.ExperimentalTaskList) {
+        //                var windowText = new StringBuilder(256);
+        //                WinAPI.GetWindowText(hWnd, windowText, windowText.Capacity);
+        //                Logger.LogInfo($"GetWindowText:  {windowText}");
 
-                        Logger.LogInfo($"Visible: {IsWindowVisible(hWnd)}");
-                        Logger.LogInfo($"Owner: {GetWindow(hWnd, GW_OWNER)}");
-                        Logger.LogInfo($"REDIRECT: {GetWindowLong(hWnd, GWL_EXSTYLE) & (WS_EX_NOREDIRECTIONBITMAP)}");
-                        Logger.LogInfo($"TOOL: {GetWindowLong(hWnd, GWL_EXSTYLE) & (WS_EX_TOOLWINDOW)}");
-                        Logger.LogInfo($"APPWINDOW: {GetWindowLong(hWnd, GWL_EXSTYLE) & (WS_EX_APPWINDOW)}");
-                        Logger.LogInfo($"Owner Min: {IsIconic(GetWindow(hWnd, GW_OWNER))}");
+        //                Logger.LogInfo($"Visible: {WinAPI.IsWindowVisible(hWnd)}");
+        //                Logger.LogInfo($"Owner: {WinAPI.GetWindow(hWnd, WinAPI.GW_OWNER)}");
+        //                Logger.LogInfo($"REDIRECT: {WinAPI.GetWindowLong(hWnd, WinAPI.GWL_EXSTYLE) & (WinAPI.WS_EX_NOREDIRECTIONBITMAP)}");
+        //                Logger.LogInfo($"TOOL: {WinAPI.GetWindowLong(hWnd, WinAPI.GWL_EXSTYLE) & (WinAPI.WS_EX_TOOLWINDOW)}");
+        //                Logger.LogInfo($"APPWINDOW: {WinAPI.GetWindowLong(hWnd, WinAPI.GWL_EXSTYLE) & (WinAPI.WS_EX_APPWINDOW)}");
+        //                Logger.LogInfo($"Owner Min: {WinAPI.IsIconic(WinAPI.GetWindow(hWnd, WinAPI.GW_OWNER))}");
 
-                        if (!IsWindowVisible(hWnd)) return true;
-                        var exStyle = GetWindowLong(hWnd, GWL_EXSTYLE);
-                        if ((exStyle & WS_EX_NOREDIRECTIONBITMAP) != 0) return true;
-                        if ((exStyle & WS_EX_TOOLWINDOW) != 0) return true;
-                        var ownerHWnd = GetWindow(hWnd, GW_OWNER);
-                        if ((ownerHWnd != IntPtr.Zero) && ((exStyle & WS_EX_APPWINDOW) == 0 || IsIconic(ownerHWnd))) return true;
+        //                if (!WinAPI.IsWindowVisible(hWnd)) return true;
+        //                var exStyle = WinAPI.GetWindowLong(hWnd, WinAPI.GWL_EXSTYLE);
+        //                if ((exStyle & WinAPI.WS_EX_NOREDIRECTIONBITMAP) != 0) return true;
+        //                if ((exStyle & WinAPI.WS_EX_TOOLWINDOW) != 0) return true;
+        //                var ownerHWnd = WinAPI.GetWindow(hWnd, WinAPI.GW_OWNER);
+        //                if ((ownerHWnd != IntPtr.Zero) && ((exStyle & WinAPI.WS_EX_APPWINDOW) == 0 || WinAPI.IsIconic(ownerHWnd))) return true;
 
-                        // Join the club!
-                        taskListAsHwnd.Add(hWnd);
-                    }
-                    // Magic spells to select windows on the taskbar 
-                    else if (IsWindowVisible(hWnd) &&
-                        GetWindow(hWnd, GW_OWNER) == IntPtr.Zero &&
-                        (GetWindowLong(hWnd, GWL_EXSTYLE) & (WS_EX_NOREDIRECTIONBITMAP | WS_EX_TOOLWINDOW)) == 0) {
-                        taskListAsHwnd.Add(hWnd);
-                    }
-                    return true;
-                },
-                IntPtr.Zero);
+        //                // Join the club!
+        //                taskListAsHwnd.Add(hWnd);
+        //            }
+        //            // Magic spells to select windows on the taskbar 
+        //            else if (WinAPI.IsWindowVisible(hWnd) &&
+        //                WinAPI.GetWindow(hWnd, WinAPI.GW_OWNER) == IntPtr.Zero &&
+        //                (WinAPI.GetWindowLong(hWnd, WinAPI.GWL_EXSTYLE) & (WinAPI.WS_EX_NOREDIRECTIONBITMAP | WinAPI.WS_EX_TOOLWINDOW)) == 0) {
+        //                taskListAsHwnd.Add(hWnd);
+        //            }
+        //            return true;
+        //        },
+        //        IntPtr.Zero);
 
-            return taskListAsHwnd;
-        }
+        //    return taskListAsHwnd;
+        //}
 
 
         //
@@ -174,7 +146,7 @@ namespace TaskBoardWf
         // Update Task controls on the Board, delete obsolete Task controls and add new Task controls
         public void Renew()
         {
-            var runningTasks = GetTaskHwndList();
+            var runningTasks = WinAPI.GetTaskHwndList();
             var taskToRemove = new List<TaskUserControl>();
 
             foreach (var taskControl in Controls.OfType<TaskUserControl>()) {
