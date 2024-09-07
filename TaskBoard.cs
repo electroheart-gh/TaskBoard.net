@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Windows.Forms;
 
 namespace TaskBoardWf
@@ -64,51 +62,6 @@ namespace TaskBoardWf
             BringToFront();
             WindowState = FormWindowState.Maximized;
         }
-
-
-        // Get window handles of the windows on the taskbar
-        //public static List<IntPtr> GetTaskHwndList()
-        //{
-        //    var taskListAsHwnd = new List<IntPtr>();
-
-        //    WinAPI.EnumWindows(
-        //        (hWnd, lParam) =>
-        //        {
-        //            if (Program.appSettings.ExperimentalTaskList) {
-        //                var windowText = new StringBuilder(256);
-        //                WinAPI.GetWindowText(hWnd, windowText, windowText.Capacity);
-        //                Logger.LogInfo($"GetWindowText:  {windowText}");
-
-        //                Logger.LogInfo($"Visible: {WinAPI.IsWindowVisible(hWnd)}");
-        //                Logger.LogInfo($"Owner: {WinAPI.GetWindow(hWnd, WinAPI.GW_OWNER)}");
-        //                Logger.LogInfo($"REDIRECT: {WinAPI.GetWindowLong(hWnd, WinAPI.GWL_EXSTYLE) & (WinAPI.WS_EX_NOREDIRECTIONBITMAP)}");
-        //                Logger.LogInfo($"TOOL: {WinAPI.GetWindowLong(hWnd, WinAPI.GWL_EXSTYLE) & (WinAPI.WS_EX_TOOLWINDOW)}");
-        //                Logger.LogInfo($"APPWINDOW: {WinAPI.GetWindowLong(hWnd, WinAPI.GWL_EXSTYLE) & (WinAPI.WS_EX_APPWINDOW)}");
-        //                Logger.LogInfo($"Owner Min: {WinAPI.IsIconic(WinAPI.GetWindow(hWnd, WinAPI.GW_OWNER))}");
-
-        //                if (!WinAPI.IsWindowVisible(hWnd)) return true;
-        //                var exStyle = WinAPI.GetWindowLong(hWnd, WinAPI.GWL_EXSTYLE);
-        //                if ((exStyle & WinAPI.WS_EX_NOREDIRECTIONBITMAP) != 0) return true;
-        //                if ((exStyle & WinAPI.WS_EX_TOOLWINDOW) != 0) return true;
-        //                var ownerHWnd = WinAPI.GetWindow(hWnd, WinAPI.GW_OWNER);
-        //                if ((ownerHWnd != IntPtr.Zero) && ((exStyle & WinAPI.WS_EX_APPWINDOW) == 0 || WinAPI.IsIconic(ownerHWnd))) return true;
-
-        //                // Join the club!
-        //                taskListAsHwnd.Add(hWnd);
-        //            }
-        //            // Magic spells to select windows on the taskbar 
-        //            else if (WinAPI.IsWindowVisible(hWnd) &&
-        //                WinAPI.GetWindow(hWnd, WinAPI.GW_OWNER) == IntPtr.Zero &&
-        //                (WinAPI.GetWindowLong(hWnd, WinAPI.GWL_EXSTYLE) & (WinAPI.WS_EX_NOREDIRECTIONBITMAP | WinAPI.WS_EX_TOOLWINDOW)) == 0) {
-        //                taskListAsHwnd.Add(hWnd);
-        //            }
-        //            return true;
-        //        },
-        //        IntPtr.Zero);
-
-        //    return taskListAsHwnd;
-        //}
-
 
         //
         // Methods for display control
