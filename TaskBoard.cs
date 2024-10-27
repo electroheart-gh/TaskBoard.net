@@ -58,13 +58,20 @@ namespace TaskBoardWf
             // Global Hot Key
             hotKey = new HotKey(MOD_KEY.ALT, Keys.Q);  // Keys.MButton not work
             hotKey.HotKeyPush += new EventHandler(hotKey_HotKeyPush);
+
+            Logger.LogError("hotkey registered");
         }
 
         void hotKey_HotKeyPush(object sender, EventArgs e)
         {
-            Activate();
-            BringToFront();
-            WindowState = FormWindowState.Maximized;
+            if (Form.ActiveForm != this) {
+                Activate();
+                BringToFront();
+                WindowState = FormWindowState.Maximized;
+            }
+            else {
+                Logger.LogError("HotKeyPushed");
+            }
         }
 
         //
@@ -320,6 +327,19 @@ namespace TaskBoardWf
         private void TaskBoard_Activated(object sender, EventArgs e)
         {
             Renew();
+            // SelectNextTask(Handle);
+        }
+
+        private void SelectNextTask(IntPtr handle)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void TaskBoard_KeyDown(object sender, KeyEventArgs e)
+        {
+            if ((e.KeyCode == Keys.Q && e.Alt) || (e.KeyCode == Keys.M && e.Control)) {
+                Logger.LogError("M-q");
+            }
         }
     }
 }

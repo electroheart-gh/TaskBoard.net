@@ -49,11 +49,13 @@
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.ClientSize = new System.Drawing.Size(922, 595);
             this.Controls.Add(this.RubberBandBox);
+            this.KeyPreview = true;
             this.Name = "TaskBoard";
             this.Text = "TaskBoard";
             this.Activated += new System.EventHandler(this.TaskBoard_Activated);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TaskBoard_FormClosing);
             this.Load += new System.EventHandler(this.TaskBoard_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TaskBoard_KeyDown);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TaskBoard_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.TaskBoard_MouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TaskBoard_MouseUp);
