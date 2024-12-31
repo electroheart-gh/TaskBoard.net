@@ -181,24 +181,23 @@ namespace TaskBoardWf
 
         internal static Icon GetTaskIcon(IntPtr hWnd)
         {
-            IntPtr hIcon = SendMessage(hWnd, WM_GETICON, (IntPtr)ICON_BIG, IntPtr.Zero);
-            if (hIcon == IntPtr.Zero) {
-                hIcon = SendMessage(hWnd, WM_GETICON, (IntPtr)ICON_SMALL, IntPtr.Zero);
-            }
-            if (hIcon == IntPtr.Zero) {
-                hIcon = SendMessage(hWnd, WM_GETICON, (IntPtr)ICON_SMALL, IntPtr.Zero);
-            }
-            if (hIcon == IntPtr.Zero) {
-                hIcon = GetClassLong(hWnd, GCL_HICON);
-            }
-            if (hIcon == IntPtr.Zero) {
-                hIcon = GetClassLong(hWnd, GCL_HICONSM);
-            }
-            if (hIcon != IntPtr.Zero) {
-                return Icon.FromHandle(hIcon);
-            }
-
             try {
+                IntPtr hIcon = SendMessage(hWnd, WM_GETICON, (IntPtr)ICON_BIG, IntPtr.Zero);
+                if (hIcon == IntPtr.Zero) {
+                    hIcon = SendMessage(hWnd, WM_GETICON, (IntPtr)ICON_SMALL, IntPtr.Zero);
+                }
+                if (hIcon == IntPtr.Zero) {
+                    hIcon = SendMessage(hWnd, WM_GETICON, (IntPtr)ICON_SMALL, IntPtr.Zero);
+                }
+                if (hIcon == IntPtr.Zero) {
+                    hIcon = GetClassLong(hWnd, GCL_HICON);
+                }
+                if (hIcon == IntPtr.Zero) {
+                    hIcon = GetClassLong(hWnd, GCL_HICONSM);
+                }
+                if (hIcon != IntPtr.Zero) {
+                    return Icon.FromHandle(hIcon);
+                }
                 return Icon.ExtractAssociatedIcon(GetExePath(hWnd));
             }
             catch (ArgumentException e) {

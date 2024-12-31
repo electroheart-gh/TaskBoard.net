@@ -19,6 +19,7 @@ namespace TaskBoardWf
             get { return windowHandle; }
             set {
                 windowHandle = value;
+                // abend at the next line
                 pbIcon.Image = WinAPI.GetTaskIcon(value).ToBitmap();
                 var tn = new StringBuilder(256);
                 WinAPI.GetWindowText(value, tn, tn.Capacity);

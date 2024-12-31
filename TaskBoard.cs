@@ -327,6 +327,7 @@ namespace TaskBoardWf
         private void TaskBoard_Activated(object sender, EventArgs e)
         {
             Renew();
+            // Select the icon of the next window of TaskBoard in Z order
             // SelectNextTask(Handle);
         }
 
