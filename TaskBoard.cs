@@ -129,7 +129,8 @@ namespace TaskBoardWf
             foreach (var task in taskToRemove) {
                 task.Dispose();
             }
-            // Add new tasks
+            // Add new tasks from old to new ones
+            runningTasks.Reverse();
             foreach (var newTask in runningTasks) {
                 var newTaskControl = new TaskUserControl(newTask);
                 newTaskControl.Location = ProposePosition();
