@@ -144,7 +144,7 @@ namespace TaskBoardWf
             EnumWindows(
                 (hWnd, lParam) =>
                 {
-                    if (Program.appSettings.ExperimentalTaskList) {
+                    if (!Program.appSettings.LegacyTaskList) {
                         var windowText = new StringBuilder(256);
                         GetWindowText(hWnd, windowText, windowText.Capacity);
                         Logger.LogInfo($"GetWindowText:  {windowText}");
@@ -158,7 +158,6 @@ namespace TaskBoardWf
 
                         if (!IsWindowVisible(hWnd)) return true;
                         var exStyle = GetWindowLong(hWnd, GWL_EXSTYLE);
-                        if ((exStyle & WS_EX_NOREDIRECTIONBITMAP) != 0) return true;
                         if ((exStyle & WS_EX_TOOLWINDOW) != 0) return true;
                         var ownerHWnd = GetWindow(hWnd, GW_OWNER);
                         if ((ownerHWnd != IntPtr.Zero) && ((exStyle & WS_EX_APPWINDOW) == 0 || IsIconic(ownerHWnd))) return true;
@@ -166,7 +165,7 @@ namespace TaskBoardWf
                         // Join the club!
                         taskListAsHwnd.Add(hWnd);
                     }
-                    // Magic spells to select windows on the taskbar 
+                    // Magic spells to select windows on the taskbar (LEGACY)
                     else if (IsWindowVisible(hWnd) &&
                         GetWindow(hWnd, GW_OWNER) == IntPtr.Zero &&
                         (GetWindowLong(hWnd, GWL_EXSTYLE) & (WS_EX_NOREDIRECTIONBITMAP | WS_EX_TOOLWINDOW)) == 0) {

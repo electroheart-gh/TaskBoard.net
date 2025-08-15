@@ -12,7 +12,7 @@ namespace TaskBoardWf
         public bool BackgroundThumbnail { get; set; }
         public string LogFileName { get; set; }
         public string LogLevel { get; set; }
-        public bool ExperimentalTaskList { get; set; }
+        public bool LegacyTaskList { get; set; }
 
         // Configuration class to modify display of lblTaskName
         // If Pattern match, replace it with Substitution and set the Forecolor
