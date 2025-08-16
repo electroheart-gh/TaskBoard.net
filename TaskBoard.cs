@@ -16,21 +16,26 @@ namespace TaskBoardWf
         // TODO: Make HOTKEY and colors configurable
 
         //
-        // Variables for Rubber Band 
+        // Variables 
         //
+
+        // Rubber Band (Left button drag)
         bool isSelecting;
-
         Point rubberBandStart;
-        Point rubberBandEnd;
-
         Color lineColor = Color.Purple;   // or Gray
         int lineBorder = 1;
-
         Graphics gRubberBand;
-        Pen linePen;
 
+        // Scrolling (Right button drag)
+        bool isScrolling = false;
+        private Point scrollStart;
+        private List<Rectangle> listControlGuide = new List<Rectangle>();
+        int guideRectWidth = 5;
+
+        // Global Hot Key
         HotKey hotKey;
 
+        // Window Image
         private IntPtr thumbHandle;
         private int deltaOpacity;
 
@@ -269,16 +274,21 @@ namespace TaskBoardWf
                     taskControl.IsSelected = false;
                 }
             }
+            else if (e.Button == MouseButtons.Right) {
+                scrollStart = e.Location;
+                isScrolling = true;
+                Cursor = Cursors.SizeAll;
+            }
 
             ClearWindowImage();
-
         }
+
 
         private void TaskBoard_MouseMove(object sender, MouseEventArgs e)
         {
             if (isSelecting) {
                 // Draw rubber band
-                rubberBandEnd = PointToClient(Cursor.Position);
+                Point rubberBandEnd = PointToClient(Cursor.Position);
                 RubberBandBox.Bounds = RectangleExt.Create(rubberBandStart, rubberBandEnd);
 
                 // Specifying nothing but the size creates noncolor canvas 
@@ -288,7 +298,7 @@ namespace TaskBoardWf
                 // Create Graphics object for the rubber band
                 gRubberBand = Graphics.FromImage(rubberBandBitmap);
 
-                linePen = new Pen(lineColor, lineBorder);
+                Pen linePen = new Pen(lineColor, lineBorder);
                 linePen.DashStyle = DashStyle.Dot;
                 // To show the right and bottom lines, DrawRectangle should be -1, which is not related to the size of Bitmap mentioned above
                 gRubberBand.DrawRectangle(linePen, 0, 0, RubberBandBox.Width - 1, RubberBandBox.Height - 1);
@@ -310,6 +320,14 @@ namespace TaskBoardWf
                     }
                 }
             }
+            else if (isScrolling) {
+                // Move all controls instead of scrolling Form, which does not have Panel
+                foreach (var ctrl in Controls.OfType<TaskUserControl>()) {
+                    ctrl.Location = new Point(ctrl.Location.X + e.Location.X - scrollStart.X, ctrl.Location.Y + e.Location.Y - scrollStart.Y);
+                }
+                scrollStart = e.Location;
+                ShowControlGuide();
+            }
         }
 
         private void TaskBoard_MouseUp(object sender, MouseEventArgs e)
@@ -322,6 +340,11 @@ namespace TaskBoardWf
                 RubberBandBox.Enabled = false;
 
                 isSelecting = false;
+            }
+            else if (e.Button == MouseButtons.Right) {
+                isScrolling = false;
+                Cursor = Cursors.Default;
+                ClearControlGuide();
             }
         }
 
@@ -340,7 +363,52 @@ namespace TaskBoardWf
         private void TaskBoard_KeyDown(object sender, KeyEventArgs e)
         {
             if ((e.KeyCode == Keys.Q && e.Alt) || (e.KeyCode == Keys.M && e.Control)) {
+                // Write code to exec command for M-q
                 Logger.LogError("M-q");
+            }
+        }
+
+        // Show guides for TaskControl outside TaskBoard
+        private void ShowControlGuide()
+        {
+            ClearControlGuide();
+
+            // Check if the entire control is outside the board
+            foreach (var ctrl in Controls.OfType<TaskUserControl>()) {
+                //Rectangle ctrlRect = new Rectangle(ctrl.Location, ctrl.Size);
+
+                if (ctrl.Top > this.ClientSize.Height) {
+                    listControlGuide.Add(new Rectangle(ctrl.Left, this.ClientSize.Height - guideRectWidth, ctrl.Width, guideRectWidth));
+                }
+                else if (ctrl.Bottom < 0) {
+                    listControlGuide.Add(new Rectangle(ctrl.Left, 0, ctrl.Width, guideRectWidth));
+                }
+                else if (ctrl.Left > this.ClientSize.Width) {
+                    listControlGuide.Add(new Rectangle(this.ClientSize.Width - guideRectWidth, ctrl.Top, guideRectWidth, ctrl.Height));
+                }
+                else if (ctrl.Right < 0) {
+                    listControlGuide.Add(new Rectangle(0, ctrl.Top, guideRectWidth, ctrl.Height));
+                }
+
+            }
+        }
+
+        private void ClearControlGuide()
+        {
+            listControlGuide.Clear();
+            Invalidate();
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+            // Draw control guides
+            if (listControlGuide.Count > 0) {
+                using (var guideBrush = new SolidBrush(Color.Purple)) {
+                    foreach (var rect in listControlGuide) {
+                        e.Graphics.FillRectangle(guideBrush, rect);
+                    }
+                }
             }
         }
     }
