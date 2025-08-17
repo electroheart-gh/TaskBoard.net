@@ -39,6 +39,9 @@ namespace TaskBoardWf
         private IntPtr thumbHandle;
         private int deltaOpacity;
 
+        // Scroll Overlay
+        private ScrollOverlay scrollOverlay;
+
 
         //
         // Constructor
@@ -46,6 +49,10 @@ namespace TaskBoardWf
         public TaskBoard()
         {
             InitializeComponent();
+            this.DoubleBuffered = true; // 追加
+            scrollOverlay = new ScrollOverlay();
+            //this.Controls.Add(scrollOverlay);
+            //scrollOverlay.BringToFront();
         }
 
 
@@ -278,6 +285,8 @@ namespace TaskBoardWf
                 scrollStart = e.Location;
                 isScrolling = true;
                 Cursor = Cursors.SizeAll;
+                Controls.Add(scrollOverlay);
+                scrollOverlay.BringToFront();
             }
 
             ClearWindowImage();
@@ -321,12 +330,21 @@ namespace TaskBoardWf
                 }
             }
             else if (isScrolling) {
+                //this.Controls.Add(scrollOverlay);
+                //scrollOverlay.BringToFront();
+                ClearScrollOverlay();
+                Controls.Add(scrollOverlay);
+                scrollOverlay.BringToFront();
+
                 // Move all controls instead of scrolling Form, which does not have Panel
                 foreach (var ctrl in Controls.OfType<TaskUserControl>()) {
                     ctrl.Location = new Point(ctrl.Location.X + e.Location.X - scrollStart.X, ctrl.Location.Y + e.Location.Y - scrollStart.Y);
+                    ctrl.Invalidate(); // 追加
                 }
+                this.Invalidate(); // 追加
+
                 scrollStart = e.Location;
-                ShowControlGuide();
+                ShowScrollOverlay();
             }
         }
 
@@ -344,7 +362,7 @@ namespace TaskBoardWf
             else if (e.Button == MouseButtons.Right) {
                 isScrolling = false;
                 Cursor = Cursors.Default;
-                ClearControlGuide();
+                ClearScrollOverlay();
             }
         }
 
@@ -369,33 +387,75 @@ namespace TaskBoardWf
         }
 
         // Show guides for TaskControl outside TaskBoard
-        private void ShowControlGuide()
+        private void ShowScrollOverlay()
         {
-            ClearControlGuide();
+            //ClearScrollOverlay();
 
             // Check if the entire control is outside the board
             foreach (var ctrl in Controls.OfType<TaskUserControl>()) {
-                //Rectangle ctrlRect = new Rectangle(ctrl.Location, ctrl.Size);
+                //var overlayRectangle = new Rectangle();
+                //var overlayRectangle = new Rectangle(ctrl.Location, ctrl.Size);
+                (int? guideHeight, int? guideWidth) = (null, null);
+                //(int X, int Y, int Width, int Height) overlayRectFactor= (ctrl.Left, ctrl.Top, ctrl.Width, ctrl.Height);
 
                 if (ctrl.Top > this.ClientSize.Height) {
-                    listControlGuide.Add(new Rectangle(ctrl.Left, this.ClientSize.Height - guideRectWidth, ctrl.Width, guideRectWidth));
+                    //listControlGuide.Add(new Rectangle(ctrl.Left, this.ClientSize.Height - guideRectWidth, ctrl.Width, guideRectWidth));
+                    //scrollOverlay.AddRectangle(new Rectangle(ctrl.Left, this.ClientSize.Height - guideRectWidth, ctrl.Width, guideRectWidth));
+                    //overlayRectangle = new Rectangle(overlayRectangle.Left, this.ClientSize.Height - guideRectWidth, overlayRectangle.Width, guideRectWidth);
+                    //overlayRectangle.Height = this.ClientSize.Height - ctrl.Top - guideRectWidth;
+                    guideHeight = this.ClientSize.Height - ctrl.Top - guideRectWidth;
+
                 }
                 else if (ctrl.Bottom < 0) {
-                    listControlGuide.Add(new Rectangle(ctrl.Left, 0, ctrl.Width, guideRectWidth));
+                    //listControlGuide.Add(new Rectangle(ctrl.Left, 0, ctrl.Width, guideRectWidth));
+                    //scrollOverlay.AddRectangle(new Rectangle(ctrl.Left, 0, ctrl.Width, guideRectWidth));
+                    //overlayRectFactor = new Rectangle(overlayRectFactor.Left, 0, overlayRectFactor.Width, guideRectWidth);
+                    //overlayRectangle.Height = -ctrl.Top + guideRectWidth;
+                    guideHeight = -ctrl.Top + guideRectWidth;
+
                 }
-                else if (ctrl.Left > this.ClientSize.Width) {
-                    listControlGuide.Add(new Rectangle(this.ClientSize.Width - guideRectWidth, ctrl.Top, guideRectWidth, ctrl.Height));
+
+                if (ctrl.Left > this.ClientSize.Width) {
+                    //listControlGuide.Add(new Rectangle(this.ClientSize.Width - guideRectWidth, ctrl.Top, guideRectWidth, ctrl.Height));
+                    //scrollOverlay.AddRectangle(new Rectangle(this.ClientSize.Width - guideRectWidth, ctrl.Top, guideRectWidth, ctrl.Height));
+                    //overlayRectangle.Width = this.ClientSize.Width - ctrl.Left - guideRectWidth;
+                    guideWidth = this.ClientSize.Width - ctrl.Left - guideRectWidth;
+
                 }
                 else if (ctrl.Right < 0) {
-                    listControlGuide.Add(new Rectangle(0, ctrl.Top, guideRectWidth, ctrl.Height));
+                    //listControlGuide.Add(new Rectangle(0, ctrl.Top, guideRectWidth, ctrl.Height));
+                    //scrollOverlay.AddRectangle(new Rectangle(0, ctrl.Top, guideRectWidth, ctrl.Height));
+                    //overlayRectangle.Width = -ctrl.Left + guideRectWidth;
+                    guideWidth = -ctrl.Left + guideRectWidth;
+                }
+                if (guideHeight != null || guideWidth != null) {
+                    var overlayRectangle = new Rectangle(ctrl.Location, new Size(guideWidth ?? ctrl.Width, guideHeight ?? ctrl.Height));
+                    //var overlayRectangle = new Rectangle(100, 100, 50, 50);
+
+                    scrollOverlay.AddRectangle(overlayRectangle);
                 }
 
             }
+            //foreach (var ctrl in Controls.OfType<TaskUserControl>()) {
+            //    if (ctrl.Top > this.ClientSize.Height) {
+            //        listControlGuide.Add(new Rectangle(ctrl.Left, this.ClientSize.Height - guideRectWidth, ctrl.Width, guideRectWidth));
+            //    }
+            //    else if (ctrl.Bottom < 0) {
+            //        listControlGuide.Add(new Rectangle(ctrl.Left, 0, ctrl.Width, guideRectWidth));
+            //    }
+            //    else if (ctrl.Left > this.ClientSize.Width) {
+            //        listControlGuide.Add(new Rectangle(this.ClientSize.Width - guideRectWidth, ctrl.Top, guideRectWidth, ctrl.Height));
+            //    }
+            //    else if (ctrl.Right < 0) {
+            //        listControlGuide.Add(new Rectangle(0, ctrl.Top, guideRectWidth, ctrl.Height));
+            //    }
+            //}
         }
 
-        private void ClearControlGuide()
+        private void ClearScrollOverlay()
         {
-            listControlGuide.Clear();
+            scrollOverlay.ClearOverlayRectangles();
+            Controls.Remove(scrollOverlay);
             Invalidate();
         }
 
