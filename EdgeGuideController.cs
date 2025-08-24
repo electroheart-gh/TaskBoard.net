@@ -25,11 +25,6 @@ namespace TaskBoardWf
 
         internal Form ParentForm { get; set; }
 
-        private List<EdgeGuide> edgeGuides = new List<EdgeGuide>();
-
-        private EdgeGuide edgeGuideOverlay = null;
-
-
         private class EdgeGuide : Panel
         {
             public EdgeGuide(Point location, Size size)
@@ -55,21 +50,10 @@ namespace TaskBoardWf
         // Methods
         //
 
-        // EdgeGuideController.Add
-        // Adds a new edge guide to the list of edge guides.
-
-        public void Test()
-        {
-            var Guide = new EdgeGuide(new Point(100, 100), new Size(10, 10));
-            ParentForm.Controls.Add(Guide);
-            Guide.BringToFront();
-        }
-
-        public void AddGuide(Control ctrl)
+        public void ShowEdgeGuide(Control ctrl)
         {
             int? guideHeight = null;
             int? guideWidth = null;
-
             int? guideX = null;
             int? guideY = null;
 
@@ -96,20 +80,16 @@ namespace TaskBoardWf
             }
 
             if (guideX != null) {
-
                 var Guide = new EdgeGuide(new Point((int)guideX, (int)guideY), new Size(guideWidth ?? ctrl.Width, guideHeight ?? ctrl.Height));
-                //var Guide = new EdgeGuide(new Point(100,100), new Size(100,100));
                 ParentForm.Controls.Add(Guide);
                 Guide.BringToFront();
-                Logger.LogError($"Added edge guides.");
-
             }
         }
 
-        public void AddGuides(IEnumerable<Control> controls)
+        public void ShowEdgeGuides(IEnumerable<Control> controls)
         {
-            foreach (var ctrl in controls) {
-                AddGuide(ctrl);
+            foreach (var ctrl in controls.ToList()) {
+                ShowEdgeGuide(ctrl);
             }
         }
 
@@ -117,7 +97,6 @@ namespace TaskBoardWf
         {
             foreach (var guide in ParentForm.Controls.OfType<EdgeGuide>().ToList()) {
                 ParentForm.Controls.Remove(guide);
-                Logger.LogError($"Removed edge guides.");
             }
         }
     }

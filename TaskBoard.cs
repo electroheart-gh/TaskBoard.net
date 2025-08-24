@@ -53,11 +53,7 @@ namespace TaskBoardWf
             InitializeComponent();
             this.DoubleBuffered = true; // 追加
 
-            scrollOverlay = new ScrollOverlay();
-            edgeController=new EdgeGuideController(this);
-
-            //this.Controls.Add(scrollOverlay);
-            //scrollOverlay.BringToFront();
+            edgeController = new EdgeGuideController(this);
         }
 
 
@@ -292,13 +288,14 @@ namespace TaskBoardWf
                 Cursor = Cursors.SizeAll;
                 //Controls.Add(scrollOverlay);
                 //scrollOverlay.BringToFront();
-                //edgeController.AddGuides(Controls.OfType<TaskUserControl>());
 
-                foreach (var c in Controls.OfType<TaskUserControl>().ToList()) {
-                    edgeController.AddGuide(c);
-                }
+                edgeController.ShowEdgeGuides(Controls.OfType<TaskUserControl>());
 
-                Logger.LogError("Right Mouse Down" );
+                //foreach (var c in Controls.OfType<TaskUserControl>().ToList()) {
+                //    edgeController.AddGuide(c);
+                //}
+
+                Logger.LogError("Right Mouse Down");
             }
             ClearWindowImage();
         }
