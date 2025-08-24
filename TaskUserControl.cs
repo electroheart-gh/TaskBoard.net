@@ -85,9 +85,9 @@ namespace TaskBoardWf
             WindowHandle = hwnd;
 
             MouseWheel += new MouseEventHandler(TaskUserControl_MouseWheel);
-            this.DoubleBuffered = true;
-            this.SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint, true);
-            this.UpdateStyles();
+            //this.DoubleBuffered = true;
+            //this.SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint, true);
+            //this.UpdateStyles();
 
         }
         //public TaskUserControl()

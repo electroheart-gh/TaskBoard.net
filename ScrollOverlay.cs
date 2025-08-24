@@ -8,7 +8,7 @@ namespace TaskBoardWf
     /// <summary>
     ///     holds the overlay for the scrollable control.
     /// </summary>
-    internal class ScrollOverlay : Panel
+    internal class ScrollOverlay : Control
     {
         //
         // Variables

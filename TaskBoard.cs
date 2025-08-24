@@ -42,6 +42,8 @@ namespace TaskBoardWf
         // Scroll Overlay
         private ScrollOverlay scrollOverlay;
 
+        // Edge Controller
+        private EdgeGuideController edgeController;
 
         //
         // Constructor
@@ -50,7 +52,10 @@ namespace TaskBoardWf
         {
             InitializeComponent();
             this.DoubleBuffered = true; // 追加
+
             scrollOverlay = new ScrollOverlay();
+            edgeController=new EdgeGuideController(this);
+
             //this.Controls.Add(scrollOverlay);
             //scrollOverlay.BringToFront();
         }
@@ -285,10 +290,16 @@ namespace TaskBoardWf
                 scrollStart = e.Location;
                 isScrolling = true;
                 Cursor = Cursors.SizeAll;
-                Controls.Add(scrollOverlay);
-                scrollOverlay.BringToFront();
-            }
+                //Controls.Add(scrollOverlay);
+                //scrollOverlay.BringToFront();
+                //edgeController.AddGuides(Controls.OfType<TaskUserControl>());
 
+                foreach (var c in Controls.OfType<TaskUserControl>().ToList()) {
+                    edgeController.AddGuide(c);
+                }
+
+                Logger.LogError("Right Mouse Down" );
+            }
             ClearWindowImage();
         }
 
@@ -332,19 +343,35 @@ namespace TaskBoardWf
             else if (isScrolling) {
                 //this.Controls.Add(scrollOverlay);
                 //scrollOverlay.BringToFront();
-                ClearScrollOverlay();
-                Controls.Add(scrollOverlay);
-                scrollOverlay.BringToFront();
+                //ClearScrollOverlay();
+                //Controls.Add(scrollOverlay);
+                //scrollOverlay.BringToFront();
 
                 // Move all controls instead of scrolling Form, which does not have Panel
                 foreach (var ctrl in Controls.OfType<TaskUserControl>()) {
                     ctrl.Location = new Point(ctrl.Location.X + e.Location.X - scrollStart.X, ctrl.Location.Y + e.Location.Y - scrollStart.Y);
-                    ctrl.Invalidate(); // 追加
+                    //ctrl.Invalidate(); // 追加
                 }
-                this.Invalidate(); // 追加
+                //Invalidate(); // 追加
 
                 scrollStart = e.Location;
-                ShowScrollOverlay();
+
+                // 遅いというか、TaskControlの残像が残るはなぜか
+                // 左ドラッグとの違いはなにか, 動かす control の数? Controlの追加・削除?
+
+
+                //edgeController.ClearGuides();
+                //edgeController.Test();
+                //edgeController.AddGuides(Controls.OfType<TaskUserControl>().Select(tc => (Control)tc).ToList());
+                //edgeController.AddGuides(Controls.OfType<TaskUserControl>().ToList<Control>());
+
+                //edgeController.AddGuides(Controls.OfType<TaskUserControl>());
+                //foreach (var c in Controls.OfType<TaskUserControl>()){
+                //    edgeController.AddGuide(c);
+                //}
+
+                //this.Invalidate();
+                //ShowScrollOverlay();
             }
         }
 
@@ -362,7 +389,10 @@ namespace TaskBoardWf
             else if (e.Button == MouseButtons.Right) {
                 isScrolling = false;
                 Cursor = Cursors.Default;
-                ClearScrollOverlay();
+                //ClearScrollOverlay();
+                Logger.LogError("Right Mouse Up");
+                edgeController.ClearGuides();
+
             }
         }
 
@@ -428,6 +458,7 @@ namespace TaskBoardWf
                     //overlayRectangle.Width = -ctrl.Left + guideRectWidth;
                     guideWidth = -ctrl.Left + guideRectWidth;
                 }
+
                 if (guideHeight != null || guideWidth != null) {
                     var overlayRectangle = new Rectangle(ctrl.Location, new Size(guideWidth ?? ctrl.Width, guideHeight ?? ctrl.Height));
                     //var overlayRectangle = new Rectangle(100, 100, 50, 50);
