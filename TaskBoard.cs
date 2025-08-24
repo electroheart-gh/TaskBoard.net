@@ -340,8 +340,6 @@ namespace TaskBoardWf
             else if (e.Button == MouseButtons.Right) {
                 isScrolling = false;
                 Cursor = Cursors.Default;
-                //ClearScrollOverlay();
-                Logger.LogError("Right Mouse Up");
                 edgeGuideController.ClearGuides();
 
             }
