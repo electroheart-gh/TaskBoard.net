@@ -112,9 +112,6 @@
     <Compile Include="AppSettings.cs" />
     <Compile Include="CustomTraceListener.cs" />
     <Compile Include="EdgeGuideController.cs" />
-    <Compile Include="ScrollOverlay.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="HotKey.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="RectangleExt.cs" />

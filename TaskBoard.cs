@@ -29,8 +29,6 @@ namespace TaskBoardWf
         // Scrolling (Right button drag)
         bool isScrolling = false;
         private Point scrollStart;
-        private List<Rectangle> listControlGuide = new List<Rectangle>();
-        int guideRectWidth = 5;
 
         // Global Hot Key
         HotKey hotKey;
@@ -39,11 +37,8 @@ namespace TaskBoardWf
         private IntPtr thumbHandle;
         private int deltaOpacity;
 
-        // Scroll Overlay
-        private ScrollOverlay scrollOverlay;
-
         // Edge Controller
-        private EdgeGuideController edgeController;
+        private EdgeGuideController edgeGuideController;
 
         //
         // Constructor
@@ -51,30 +46,12 @@ namespace TaskBoardWf
         public TaskBoard()
         {
             InitializeComponent();
-            this.DoubleBuffered = true; // 追加
-
-            edgeController = new EdgeGuideController(this);
+            edgeGuideController = new EdgeGuideController(this);
         }
 
-
         //
-        // Event Handlers
+        // Method for Key event
         //
-        private void TaskBoard_Load(object sender, EventArgs e)
-        {
-
-            WindowState = FormWindowState.Maximized;
-
-            // Initialize displaying Task controls on the Board using Renew()
-            Renew();
-
-            // Global Hot Key
-            hotKey = new HotKey(MOD_KEY.ALT, Keys.Q);  // Keys.MButton not work
-            hotKey.HotKeyPush += new EventHandler(hotKey_HotKeyPush);
-
-            Logger.LogError("hotkey registered");
-        }
-
         void hotKey_HotKeyPush(object sender, EventArgs e)
         {
             if (Form.ActiveForm != this) {
@@ -86,6 +63,11 @@ namespace TaskBoardWf
                 Logger.LogError("HotKeyPushed");
             }
         }
+        private void SelectNextTask(IntPtr handle)
+        {
+            throw new NotImplementedException();
+        }
+
 
         //
         // Methods for display control
@@ -158,10 +140,7 @@ namespace TaskBoardWf
         internal void DisplayWindowImage(IntPtr winHandle)
         {
             if (Program.appSettings.BackgroundThumbnail) {
-                // ISSUES: Flicker before capturing window
                 DisplayThumbnail(winHandle, opaque: true);
-                //Parent.BackgroundImage = ResizeImage(CaptureWindow(Parent.Handle));
-                //Parent.BackgroundImage = ConvertToGrayscale(ResizeImage(CaptureWindow(Parent.Handle)));
                 Bitmap screenImage = WinAPI.CaptureWindow(Handle);
                 WinAPI.DwmUnregisterThumbnail(thumbHandle);
                 thumbHandle = IntPtr.Zero;
@@ -194,18 +173,15 @@ namespace TaskBoardWf
         private static Bitmap ResizeImage(Bitmap image)
         {
             int newWidth = (int)(image.Width * 0.9);
-            //int newWidth = (int)(image.Width * 0.5);
             int newHeight = (int)(image.Height * 0.9);
-            //int newHeight = (int)(image.Height * 0.5);
 
             Bitmap resizedImage = new Bitmap(newWidth, newHeight);
             using (Graphics g = Graphics.FromImage(resizedImage)) {
-                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 g.DrawImage(image, 0, 0, newWidth, newHeight);
             }
             return resizedImage;
         }
-
 
         internal void DisplayThumbnail(IntPtr winHandle, bool opaque = false)
         {
@@ -265,8 +241,22 @@ namespace TaskBoardWf
         }
 
         //
-        // Methods for rubber band
+        // Event Handlers
         //
+        private void TaskBoard_Load(object sender, EventArgs e)
+        {
+            WindowState = FormWindowState.Maximized;
+
+            // Initialize displaying Task controls on the Board using Renew()
+            Renew();
+
+            // Global Hot Key
+            hotKey = new HotKey(MOD_KEY.ALT, Keys.Q);  // Keys.MButton not work
+            hotKey.HotKeyPush += new EventHandler(hotKey_HotKeyPush);
+
+            Logger.LogError("hotkey registered");
+        }
+
         private void TaskBoard_FormClosing(object sender, FormClosingEventArgs e)
         {
             hotKey.Dispose();
@@ -286,20 +276,10 @@ namespace TaskBoardWf
                 scrollStart = e.Location;
                 isScrolling = true;
                 Cursor = Cursors.SizeAll;
-                //Controls.Add(scrollOverlay);
-                //scrollOverlay.BringToFront();
-
-                edgeController.ShowEdgeGuides(Controls.OfType<TaskUserControl>());
-
-                //foreach (var c in Controls.OfType<TaskUserControl>().ToList()) {
-                //    edgeController.AddGuide(c);
-                //}
-
-                Logger.LogError("Right Mouse Down");
+                edgeGuideController.ShowEdgeGuides(Controls.OfType<TaskUserControl>());
             }
             ClearWindowImage();
         }
-
 
         private void TaskBoard_MouseMove(object sender, MouseEventArgs e)
         {
@@ -338,37 +318,11 @@ namespace TaskBoardWf
                 }
             }
             else if (isScrolling) {
-                //this.Controls.Add(scrollOverlay);
-                //scrollOverlay.BringToFront();
-                //ClearScrollOverlay();
-                //Controls.Add(scrollOverlay);
-                //scrollOverlay.BringToFront();
-
-                // Move all controls instead of scrolling Form, which does not have Panel
+                // Move all controls instead of scrolling Form
                 foreach (var ctrl in Controls.OfType<TaskUserControl>()) {
                     ctrl.Location = new Point(ctrl.Location.X + e.Location.X - scrollStart.X, ctrl.Location.Y + e.Location.Y - scrollStart.Y);
-                    //ctrl.Invalidate(); // 追加
                 }
-                //Invalidate(); // 追加
-
                 scrollStart = e.Location;
-
-                // 遅いというか、TaskControlの残像が残るはなぜか
-                // 左ドラッグとの違いはなにか, 動かす control の数? Controlの追加・削除?
-
-
-                //edgeController.ClearGuides();
-                //edgeController.Test();
-                //edgeController.AddGuides(Controls.OfType<TaskUserControl>().Select(tc => (Control)tc).ToList());
-                //edgeController.AddGuides(Controls.OfType<TaskUserControl>().ToList<Control>());
-
-                //edgeController.AddGuides(Controls.OfType<TaskUserControl>());
-                //foreach (var c in Controls.OfType<TaskUserControl>()){
-                //    edgeController.AddGuide(c);
-                //}
-
-                //this.Invalidate();
-                //ShowScrollOverlay();
             }
         }
 
@@ -388,7 +342,7 @@ namespace TaskBoardWf
                 Cursor = Cursors.Default;
                 //ClearScrollOverlay();
                 Logger.LogError("Right Mouse Up");
-                edgeController.ClearGuides();
+                edgeGuideController.ClearGuides();
 
             }
         }
@@ -400,103 +354,11 @@ namespace TaskBoardWf
             // SelectNextTask(Handle);
         }
 
-        private void SelectNextTask(IntPtr handle)
-        {
-            throw new NotImplementedException();
-        }
-
         private void TaskBoard_KeyDown(object sender, KeyEventArgs e)
         {
             if ((e.KeyCode == Keys.Q && e.Alt) || (e.KeyCode == Keys.M && e.Control)) {
                 // Write code to exec command for M-q
                 Logger.LogError("M-q");
-            }
-        }
-
-        // Show guides for TaskControl outside TaskBoard
-        private void ShowScrollOverlay()
-        {
-            //ClearScrollOverlay();
-
-            // Check if the entire control is outside the board
-            foreach (var ctrl in Controls.OfType<TaskUserControl>()) {
-                //var overlayRectangle = new Rectangle();
-                //var overlayRectangle = new Rectangle(ctrl.Location, ctrl.Size);
-                (int? guideHeight, int? guideWidth) = (null, null);
-                //(int X, int Y, int Width, int Height) overlayRectFactor= (ctrl.Left, ctrl.Top, ctrl.Width, ctrl.Height);
-
-                if (ctrl.Top > this.ClientSize.Height) {
-                    //listControlGuide.Add(new Rectangle(ctrl.Left, this.ClientSize.Height - guideRectWidth, ctrl.Width, guideRectWidth));
-                    //scrollOverlay.AddRectangle(new Rectangle(ctrl.Left, this.ClientSize.Height - guideRectWidth, ctrl.Width, guideRectWidth));
-                    //overlayRectangle = new Rectangle(overlayRectangle.Left, this.ClientSize.Height - guideRectWidth, overlayRectangle.Width, guideRectWidth);
-                    //overlayRectangle.Height = this.ClientSize.Height - ctrl.Top - guideRectWidth;
-                    guideHeight = this.ClientSize.Height - ctrl.Top - guideRectWidth;
-
-                }
-                else if (ctrl.Bottom < 0) {
-                    //listControlGuide.Add(new Rectangle(ctrl.Left, 0, ctrl.Width, guideRectWidth));
-                    //scrollOverlay.AddRectangle(new Rectangle(ctrl.Left, 0, ctrl.Width, guideRectWidth));
-                    //overlayRectFactor = new Rectangle(overlayRectFactor.Left, 0, overlayRectFactor.Width, guideRectWidth);
-                    //overlayRectangle.Height = -ctrl.Top + guideRectWidth;
-                    guideHeight = -ctrl.Top + guideRectWidth;
-
-                }
-
-                if (ctrl.Left > this.ClientSize.Width) {
-                    //listControlGuide.Add(new Rectangle(this.ClientSize.Width - guideRectWidth, ctrl.Top, guideRectWidth, ctrl.Height));
-                    //scrollOverlay.AddRectangle(new Rectangle(this.ClientSize.Width - guideRectWidth, ctrl.Top, guideRectWidth, ctrl.Height));
-                    //overlayRectangle.Width = this.ClientSize.Width - ctrl.Left - guideRectWidth;
-                    guideWidth = this.ClientSize.Width - ctrl.Left - guideRectWidth;
-
-                }
-                else if (ctrl.Right < 0) {
-                    //listControlGuide.Add(new Rectangle(0, ctrl.Top, guideRectWidth, ctrl.Height));
-                    //scrollOverlay.AddRectangle(new Rectangle(0, ctrl.Top, guideRectWidth, ctrl.Height));
-                    //overlayRectangle.Width = -ctrl.Left + guideRectWidth;
-                    guideWidth = -ctrl.Left + guideRectWidth;
-                }
-
-                if (guideHeight != null || guideWidth != null) {
-                    var overlayRectangle = new Rectangle(ctrl.Location, new Size(guideWidth ?? ctrl.Width, guideHeight ?? ctrl.Height));
-                    //var overlayRectangle = new Rectangle(100, 100, 50, 50);
-
-                    scrollOverlay.AddRectangle(overlayRectangle);
-                }
-
-            }
-            //foreach (var ctrl in Controls.OfType<TaskUserControl>()) {
-            //    if (ctrl.Top > this.ClientSize.Height) {
-            //        listControlGuide.Add(new Rectangle(ctrl.Left, this.ClientSize.Height - guideRectWidth, ctrl.Width, guideRectWidth));
-            //    }
-            //    else if (ctrl.Bottom < 0) {
-            //        listControlGuide.Add(new Rectangle(ctrl.Left, 0, ctrl.Width, guideRectWidth));
-            //    }
-            //    else if (ctrl.Left > this.ClientSize.Width) {
-            //        listControlGuide.Add(new Rectangle(this.ClientSize.Width - guideRectWidth, ctrl.Top, guideRectWidth, ctrl.Height));
-            //    }
-            //    else if (ctrl.Right < 0) {
-            //        listControlGuide.Add(new Rectangle(0, ctrl.Top, guideRectWidth, ctrl.Height));
-            //    }
-            //}
-        }
-
-        private void ClearScrollOverlay()
-        {
-            scrollOverlay.ClearOverlayRectangles();
-            Controls.Remove(scrollOverlay);
-            Invalidate();
-        }
-
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            base.OnPaint(e);
-            // Draw control guides
-            if (listControlGuide.Count > 0) {
-                using (var guideBrush = new SolidBrush(Color.Purple)) {
-                    foreach (var rect in listControlGuide) {
-                        e.Graphics.FillRectangle(guideBrush, rect);
-                    }
-                }
             }
         }
     }

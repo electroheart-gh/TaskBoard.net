@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace TaskBoardWf
 {
     internal class EdgeGuideController
-
     {
         // This class is used to create a guide rectangle for the TaskBoard control.
-        // It can be used to draw a rectangle on the control to guide the user.
+        // It draws rectangles on the edge of TaskBoard to indicate the controls out of the TaskBoard.
+        // Gave up the full Panel overlay strategy and moving guides with right button drag due to the performance issue
+        // It could be improved by four separated Panel strategy
 
         //
         // Constants
@@ -41,15 +39,11 @@ namespace TaskBoardWf
         public EdgeGuideController(Form parentForm)
         {
             ParentForm = parentForm;
-
-            // test code
-            //edgeGuideOverlay = new EdgeGuide(new Point(0, 0), new Size(100, 100));  
         }
 
         //
         // Methods
         //
-
         public void ShowEdgeGuide(Control ctrl)
         {
             int? guideHeight = null;
@@ -88,6 +82,7 @@ namespace TaskBoardWf
 
         public void ShowEdgeGuides(IEnumerable<Control> controls)
         {
+            // To avoid modifying the collection during iteration, added ToList()
             foreach (var ctrl in controls.ToList()) {
                 ShowEdgeGuide(ctrl);
             }
@@ -95,6 +90,7 @@ namespace TaskBoardWf
 
         public void ClearGuides()
         {
+            // To avoid modifying the collection during iteration, added ToList()
             foreach (var guide in ParentForm.Controls.OfType<EdgeGuide>().ToList()) {
                 ParentForm.Controls.Remove(guide);
             }
