@@ -276,6 +276,7 @@ namespace TaskBoardWf
                 scrollStart = e.Location;
                 isScrolling = true;
                 Cursor = Cursors.SizeAll;
+
                 edgeGuideController.ShowEdgeGuides(Controls.OfType<TaskUserControl>());
             }
             ClearWindowImage();
@@ -322,6 +323,13 @@ namespace TaskBoardWf
                 foreach (var ctrl in Controls.OfType<TaskUserControl>()) {
                     ctrl.Location = new Point(ctrl.Location.X + e.Location.X - scrollStart.X, ctrl.Location.Y + e.Location.Y - scrollStart.Y);
                 }
+
+                // Update edge guides only when moved
+                if (Math.Abs(scrollStart.X - e.Location.X) > 0 || Math.Abs(scrollStart.Y - e.Location.Y) > 0) {
+                    edgeGuideController.ClearGuides();
+                    edgeGuideController.ShowEdgeGuides(Controls.OfType<TaskUserControl>());
+                }
+
                 scrollStart = e.Location;
             }
         }
@@ -340,6 +348,7 @@ namespace TaskBoardWf
             else if (e.Button == MouseButtons.Right) {
                 isScrolling = false;
                 Cursor = Cursors.Default;
+
                 edgeGuideController.ClearGuides();
 
             }
