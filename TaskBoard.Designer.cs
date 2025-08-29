@@ -59,6 +59,7 @@
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TaskBoard_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.TaskBoard_MouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TaskBoard_MouseUp);
+            this.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.TaskBoard_PreviewKeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.RubberBandBox)).EndInit();
             this.ResumeLayout(false);
 

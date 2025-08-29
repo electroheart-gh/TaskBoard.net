@@ -200,6 +200,13 @@ namespace TaskBoardWf
             ((TaskBoard)this.FindForm()).ClearWindowImage();
         }
 
+        private void TaskUserControl_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyCode == Keys.Right || e.KeyCode == Keys.Left || e.KeyCode == Keys.Up || e.KeyCode == Keys.Down) {
+                e.IsInputKey = true;
+            }
+        }
+
         // TODO: Create menu item to save task position to place task with same task name
     }
 }

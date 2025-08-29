@@ -120,6 +120,7 @@
             this.MouseHover += new System.EventHandler(this.TaskUserControl_MouseHover);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TaskUserControl_MouseUp);
+            this.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.TaskUserControl_PreviewKeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).EndInit();
             this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
