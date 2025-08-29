@@ -71,6 +71,102 @@ namespace TaskBoardWf
         }
 
 
+        private void ForegroundSelectedTask()
+        {
+            foreach (var taskControl in Controls.OfType<TaskUserControl>()) {
+                if (taskControl.IsSelected) {
+                    WinAPI.SetForegroundTask(taskControl.WindowHandle);
+                    break;
+                }
+            }
+        }
+
+        private void SelectRightTask()
+        {
+            var selectedControl = Controls.OfType<TaskUserControl>().FirstOrDefault(c => c.IsSelected);
+            if (selectedControl is null) {
+                // TODO: If nothing selected, select most recent Task
+                var topControl = Controls.OfType<TaskUserControl>().First().IsSelected = true;
+                return;
+            }
+
+            var targetControl = Controls.OfType<TaskUserControl>()
+                .Where(c => c.Right > selectedControl.Right)
+                // Select controls nearly on the same line
+                .Where(c => Math.Abs(c.Top - selectedControl.Top) < selectedControl.Height)
+                // Do not select controls out of the screen area
+                .Where(c => c.Left < ClientSize.Width && c.Right > 0)
+                .Where(c => c.Top < ClientSize.Height && c.Bottom > 0)
+                .OrderBy(c => c.Right)
+                .FirstOrDefault();
+            if (targetControl is null) return;
+
+            selectedControl.IsSelected = false;
+            targetControl.IsSelected = true;
+        }
+
+        private void SelectLeftTask()
+        {
+            var selectedControl = Controls.OfType<TaskUserControl>().FirstOrDefault(c => c.IsSelected);
+            if (selectedControl is null) {
+                var topControl = Controls.OfType<TaskUserControl>().First().IsSelected = true;
+                return;
+            }
+
+            var targetControl = Controls.OfType<TaskUserControl>()
+                .Where(c => c.Right < selectedControl.Right)
+                .Where(c => Math.Abs(c.Top - selectedControl.Top) < selectedControl.Height)
+                .Where(c => c.Left < ClientSize.Width && c.Right > 0)
+                .Where(c => c.Top < ClientSize.Height && c.Bottom > 0)
+                .OrderBy(c => c.Right)
+                .OrderByDescending(c => c.Right)
+                .FirstOrDefault();
+            if (targetControl is null) return;
+
+            selectedControl.IsSelected = false;
+            targetControl.IsSelected = true;
+        }
+        private void SelectUpperTask()
+        {
+            var selectedControl = Controls.OfType<TaskUserControl>().FirstOrDefault(c => c.IsSelected);
+            if (selectedControl is null) {
+                var topControl = Controls.OfType<TaskUserControl>().First().IsSelected = true;
+                return;
+            }
+
+            var targetControl = Controls.OfType<TaskUserControl>()
+                .Where(c => c.Top < selectedControl.Top)
+                .Where(c => c.Left < ClientSize.Width && c.Right > 0)
+                .Where(c => c.Top < ClientSize.Height && c.Bottom > 0)
+                .OrderBy(c => c.Right)
+                .OrderByDescending(c => c.Top)
+                .FirstOrDefault();
+            if (targetControl is null) return;
+
+            selectedControl.IsSelected = false;
+            targetControl.IsSelected = true;
+        }
+        private void SelectLowerTask()
+        {
+            var selectedControl = Controls.OfType<TaskUserControl>().FirstOrDefault(c => c.IsSelected);
+            if (selectedControl is null) {
+                var topControl = Controls.OfType<TaskUserControl>().First().IsSelected = true;
+                return;
+            }
+
+            var targetControl = Controls.OfType<TaskUserControl>()
+                .Where(c => c.Top > selectedControl.Top)
+                .Where(c => c.Left < ClientSize.Width && c.Right > 0)
+                .Where(c => c.Top < ClientSize.Height && c.Bottom > 0)
+                .OrderBy(c => c.Right)
+                .OrderBy(c => c.Top)
+                .FirstOrDefault();
+            if (targetControl is null) return;
+
+            selectedControl.IsSelected = false;
+            targetControl.IsSelected = true;
+        }
+
         //
         // Methods for display control
         //
@@ -137,7 +233,6 @@ namespace TaskBoardWf
             // TODO: Save tasks positions to recover the layout when restarting after crashes
             // TODO: Save tasks positions to avoid rearrange tasks every time logging in using short cut and/or MiLauncher
         }
-
 
         internal void DisplayWindowImage(IntPtr winHandle)
         {
@@ -363,6 +458,7 @@ namespace TaskBoardWf
             // SelectNextTask(Handle);
         }
 
+
         //
         // Keyboard interfaces
         //
@@ -388,102 +484,7 @@ namespace TaskBoardWf
                 SelectLowerTask();
             }
         }
-
-        private void SelectRightTask()
-        {
-            var selectedControl = Controls.OfType<TaskUserControl>().FirstOrDefault(c => c.IsSelected);
-            if (selectedControl is null) {
-                // TODO: If nothing selected, select most recent Task
-                var topControl = Controls.OfType<TaskUserControl>().First().IsSelected = true;
-                return;
-            }
-
-            var targetControl = Controls.OfType<TaskUserControl>()
-                .Where(c => c.Right > selectedControl.Right)
-                // Select controls nearly on the same line
-                .Where(c => Math.Abs(c.Top - selectedControl.Top) < selectedControl.Height)
-                // Do not select controls out of the screen area
-                .Where(c => c.Left < ClientSize.Width && c.Right > 0)
-                .Where(c => c.Top < ClientSize.Height && c.Bottom > 0)
-                .OrderBy(c => c.Right)
-                .FirstOrDefault();
-            if (targetControl is null) return;
-
-            selectedControl.IsSelected = false;
-            targetControl.IsSelected = true;
-        }
-
-        private void SelectLeftTask()
-        {
-            var selectedControl = Controls.OfType<TaskUserControl>().FirstOrDefault(c => c.IsSelected);
-            if (selectedControl is null) {
-                var topControl = Controls.OfType<TaskUserControl>().First().IsSelected = true;
-                return;
-            }
-
-            var targetControl = Controls.OfType<TaskUserControl>()
-                .Where(c => c.Right < selectedControl.Right)
-                .Where(c => Math.Abs(c.Top - selectedControl.Top) < selectedControl.Height)
-                .Where(c => c.Left < ClientSize.Width && c.Right > 0)
-                .Where(c => c.Top < ClientSize.Height && c.Bottom > 0)
-                .OrderBy(c => c.Right)
-                .OrderByDescending(c => c.Right)
-                .FirstOrDefault();
-            if (targetControl is null) return;
-
-            selectedControl.IsSelected = false;
-            targetControl.IsSelected = true;
-        }
-        private void SelectUpperTask()
-        {
-            var selectedControl = Controls.OfType<TaskUserControl>().FirstOrDefault(c => c.IsSelected);
-            if (selectedControl is null) {
-                var topControl = Controls.OfType<TaskUserControl>().First().IsSelected = true;
-                return;
-            }
-
-            var targetControl = Controls.OfType<TaskUserControl>()
-                .Where(c => c.Top < selectedControl.Top)
-                .Where(c => c.Left < ClientSize.Width && c.Right > 0)
-                .Where(c => c.Top < ClientSize.Height && c.Bottom > 0)
-                .OrderBy(c => c.Right)
-                .OrderByDescending(c => c.Top)
-                .FirstOrDefault();
-            if (targetControl is null) return;
-
-            selectedControl.IsSelected = false;
-            targetControl.IsSelected = true;
-        }
-        private void SelectLowerTask()
-        {
-            var selectedControl = Controls.OfType<TaskUserControl>().FirstOrDefault(c => c.IsSelected);
-            if (selectedControl is null) {
-                var topControl = Controls.OfType<TaskUserControl>().First().IsSelected = true;
-                return;
-            }
-
-            var targetControl = Controls.OfType<TaskUserControl>()
-                .Where(c => c.Top > selectedControl.Top)
-                .Where(c => c.Left < ClientSize.Width && c.Right > 0)
-                .Where(c => c.Top < ClientSize.Height && c.Bottom > 0)
-                .OrderBy(c => c.Right)
-                .OrderBy(c => c.Top)
-                .FirstOrDefault();
-            if (targetControl is null) return;
-
-            selectedControl.IsSelected = false;
-            targetControl.IsSelected = true;
-        }
-
-        private void ForegroundSelectedTask()
-        {
-            foreach (var taskControl in Controls.OfType<TaskUserControl>()) {
-                if (taskControl.IsSelected) {
-                    WinAPI.SetForegroundTask(taskControl.WindowHandle);
-                    break;
-                }
-            }
-        }
+                
 
         private void TaskBoard_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
